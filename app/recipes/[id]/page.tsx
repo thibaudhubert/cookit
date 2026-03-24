@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/Navbar'
-import { Clock, Users, ChefHat, Edit, Trash2, User } from 'lucide-react'
+import { Clock, Users, ChefHat, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import type { Recipe, RecipeIngredient, RecipeStep, Profile } from '@/lib/types'
 import Link from 'next/link'
-import { DeleteRecipeButton } from '@/components/DeleteRecipeButton'
 
 interface RecipePageProps {
   params: {
@@ -42,10 +41,6 @@ export default async function RecipePage({ params }: RecipePageProps) {
     .select('*')
     .eq('recipe_id', params.id)
     .order('position', { ascending: true })
-
-  // Check if current user is the author
-  const { data: { user } } = await supabase.auth.getUser()
-  const isAuthor = user?.id === recipe.author_id
 
   const totalTime = (recipe.prep_time_minutes || 0) + (recipe.cook_time_minutes || 0)
 
@@ -109,20 +104,6 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 </p>
               </div>
             </Link>
-
-            {/* Edit/Delete Buttons */}
-            {isAuthor && (
-              <div className="flex gap-2">
-                <Link
-                  href={`/recipes/${recipe.id}/edit`}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit
-                </Link>
-                <DeleteRecipeButton recipeId={recipe.id} />
-              </div>
-            )}
           </div>
         </div>
 
