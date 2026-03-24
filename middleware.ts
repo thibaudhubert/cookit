@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refreshing the auth token
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   // Protected routes - redirect to /auth if not authenticated
   const protectedPaths = ['/feed', '/explore', '/profile']
@@ -36,14 +36,14 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   )
 
-  if (isProtectedPath && !user) {
+  if (isProtectedPath && !session) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth'
     return NextResponse.redirect(url)
   }
 
   // If authenticated and trying to access /auth, redirect to /feed
-  if (request.nextUrl.pathname === '/auth' && user) {
+  if (request.nextUrl.pathname === '/auth' && session) {
     const url = request.nextUrl.clone()
     url.pathname = '/feed'
     return NextResponse.redirect(url)
