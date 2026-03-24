@@ -9,9 +9,10 @@ export function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
 
   useEffect(() => {
+    const supabase = createClient()
+
     // Get initial session
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -59,7 +60,7 @@ export function useCurrentUser() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [])
 
   return { user, profile, loading }
 }
