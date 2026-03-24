@@ -1,5 +1,7 @@
 import { Navbar } from '@/components/Navbar'
 
+export const dynamic = 'force-dynamic'
+
 export default function FeedPage() {
   return (
     <div className="min-h-screen bg-gray-50">
