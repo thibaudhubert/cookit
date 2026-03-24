@@ -15,13 +15,21 @@ export default function Home() {
           Share your recipes. Cook with friends.
         </p>
 
-        {/* CTA Button */}
-        <Link
-          href="/auth"
-          className="rounded-lg bg-gray-900 px-8 py-3 text-white transition-colors hover:bg-gray-800"
-        >
-          Sign in with Google
-        </Link>
+        {/* CTA Buttons */}
+        <div className="flex gap-4">
+          <Link
+            href="/auth"
+            className="rounded-lg bg-gray-900 px-8 py-3 text-white transition-colors hover:bg-gray-800"
+          >
+            Sign Up
+          </Link>
+          <Link
+            href="/auth"
+            className="rounded-lg border border-gray-300 px-8 py-3 text-gray-900 transition-colors hover:bg-gray-50"
+          >
+            Log In
+          </Link>
+        </div>
       </main>
     </div>
   );
