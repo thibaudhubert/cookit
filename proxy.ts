@@ -1,7 +1,23 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PROTECTED_PATHS = ['/feed', '/profile', '/recipes']
+const AUTH_PATH = '/auth'
+const AUTH_CALLBACK_PATH = '/auth/callback'
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  const isProtectedPath = PROTECTED_PATHS.some((path) =>
+    pathname.startsWith(path)
+  )
+  const isAuthPath = pathname === AUTH_PATH
+  const isAuthCallbackPath = pathname.startsWith(AUTH_CALLBACK_PATH)
+
+  if (!isProtectedPath && !isAuthPath && !isAuthCallbackPath) {
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -23,20 +39,26 @@ export async function proxy(request: NextRequest) {
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
 
-  const protectedPaths = ['/feed', '/profile', '/explore', '/recipes']
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  )
+  if (error) {
+    if (isProtectedPath) {
+      const url = request.nextUrl.clone()
+      url.pathname = AUTH_PATH
+      return NextResponse.redirect(url)
+    }
+
+    return NextResponse.next()
+  }
 
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth'
+    url.pathname = AUTH_PATH
     return NextResponse.redirect(url)
   }
 
-  if (request.nextUrl.pathname === '/auth' && user) {
+  if (isAuthPath && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/feed'
     return NextResponse.redirect(url)
@@ -47,6 +69,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }
