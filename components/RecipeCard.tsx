@@ -1,29 +1,113 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
-import type { Recipe, Profile } from '@/lib/types/recipe'
-
-interface RecipeWithAuthor extends Recipe {
-  author: Profile
-}
+import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 interface RecipeCardProps {
-  recipe: RecipeWithAuthor
+  recipe: RecipeWithSocialData
 }
 
 export default function RecipeCard({ recipe }: RecipeCardProps) {
+  const [isLiked, setIsLiked] = useState(recipe.is_liked_by_me)
+  const [likeCount, setLikeCount] = useState(recipe.like_count)
+  const [isBookmarked, setIsBookmarked] = useState(recipe.is_bookmarked_by_me)
   const totalTime = (recipe.prep_time_minutes || 0) + (recipe.cook_time_minutes || 0)
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // Optimistic update
+    const newIsLiked = !isLiked
+    setIsLiked(newIsLiked)
+    setLikeCount((prev) => (newIsLiked ? prev + 1 : prev - 1))
+
+    try {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        // Revert if not authenticated
+        setIsLiked(isLiked)
+        setLikeCount(likeCount)
+        return
+      }
+
+      if (newIsLiked) {
+        const { error } = await supabase
+          .from('likes')
+          .insert({ user_id: user.id, recipe_id: recipe.id })
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('likes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('recipe_id', recipe.id)
+        if (error) throw error
+      }
+    } catch (error) {
+      // Revert on error
+      setIsLiked(isLiked)
+      setLikeCount(likeCount)
+      console.error('Error toggling like:', error)
+    }
+  }
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // Optimistic update
+    const newIsBookmarked = !isBookmarked
+    setIsBookmarked(newIsBookmarked)
+
+    try {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        // Revert if not authenticated
+        setIsBookmarked(isBookmarked)
+        return
+      }
+
+      if (newIsBookmarked) {
+        const { error } = await supabase
+          .from('bookmarks')
+          .insert({ user_id: user.id, recipe_id: recipe.id })
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('recipe_id', recipe.id)
+        if (error) throw error
+      }
+    } catch (error) {
+      // Revert on error
+      setIsBookmarked(isBookmarked)
+      console.error('Error toggling bookmark:', error)
+    }
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       {/* Author Header */}
       <div className="p-4 flex items-center gap-3">
-        <Link href={`/profile/${recipe.author.username}`}>
-          {recipe.author.avatar_url ? (
+        <Link href={`/profile/${recipe.author_username}`}>
+          {recipe.author_avatar_url ? (
             <img
-              src={recipe.author.avatar_url}
-              alt={recipe.author.display_name || recipe.author.username}
+              src={recipe.author_avatar_url}
+              alt={recipe.author_display_name || recipe.author_username}
               className="w-10 h-10 rounded-full object-cover hover:opacity-80 transition-opacity"
             />
           ) : (
@@ -34,10 +118,10 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </Link>
         <div className="flex-1 min-w-0">
           <Link
-            href={`/profile/${recipe.author.username}`}
+            href={`/profile/${recipe.author_username}`}
             className="font-semibold text-gray-900 hover:underline block truncate"
           >
-            {recipe.author.display_name || recipe.author.username}
+            {recipe.author_display_name || recipe.author_username}
           </Link>
           <p className="text-sm text-gray-500">{timeAgo(recipe.created_at)}</p>
         </div>
@@ -105,11 +189,17 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         {/* Action Buttons */}
         <div className="flex items-center gap-6 pt-3 border-t border-gray-100">
           <button
-            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
-            aria-label="Like recipe"
+            onClick={handleLike}
+            className={`flex items-center gap-2 transition-colors ${
+              isLiked ? 'text-red-500' : 'text-gray-600 hover:text-red-500'
+            }`}
+            aria-label={isLiked ? 'Unlike recipe' : 'Like recipe'}
           >
-            <span className="text-xl">❤️</span>
-            <span className="text-sm font-medium">Like</span>
+            <span className="text-xl">{isLiked ? '❤️' : '🤍'}</span>
+            <span className="text-sm font-medium">
+              {likeCount > 0 && <span className="mr-1">{likeCount}</span>}
+              Like
+            </span>
           </button>
           <button
             className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
@@ -119,10 +209,13 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             <span className="text-sm font-medium">Comment</span>
           </button>
           <button
-            className="flex items-center gap-2 text-gray-600 hover:text-amber-500 transition-colors"
-            aria-label="Bookmark recipe"
+            onClick={handleBookmark}
+            className={`flex items-center gap-2 transition-colors ${
+              isBookmarked ? 'text-amber-500' : 'text-gray-600 hover:text-amber-500'
+            }`}
+            aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark recipe'}
           >
-            <span className="text-xl">🔖</span>
+            <span className="text-xl">{isBookmarked ? '🔖' : '📑'}</span>
             <span className="text-sm font-medium">Bookmark</span>
           </button>
         </div>

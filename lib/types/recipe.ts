@@ -42,3 +42,13 @@ export interface RecipeWithDetails extends Recipe {
   ingredients: RecipeIngredient[]
   steps: RecipeStep[]
 }
+
+export interface RecipeWithSocialData extends Recipe {
+  author_username: string
+  author_display_name: string | null
+  author_avatar_url: string | null
+  like_count: number
+  is_liked_by_me: boolean
+  is_bookmarked_by_me: boolean
+  comment_count: number
+}

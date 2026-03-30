@@ -4,11 +4,7 @@ import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import SearchBar from '@/components/SearchBar'
-import type { Recipe, Profile } from '@/lib/types/recipe'
-
-interface RecipeWithAuthor extends Recipe {
-  author: Profile
-}
+import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
 
@@ -30,28 +26,28 @@ export default async function ExplorePage({
     redirect('/auth')
   }
 
-  // Build query with optional search filter
-  let query = supabase
-    .from('recipes')
-    .select(
-      `
-      *,
-      author:profiles(*)
-    `,
-      { count: 'exact' }
-    )
+  // Fetch recipes using database function with social data and search
+  const { data: recipes, error } = await supabase.rpc('get_feed_recipes', {
+    p_user_id: user.id,
+    p_limit: RECIPES_PER_PAGE,
+    p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
+    p_search_query: searchQuery || null,
+  })
 
-  // Add search filter if query exists
-  if (searchQuery) {
-    query = query.ilike('title', `%${searchQuery}%`)
+  if (error) {
+    console.error('Error fetching recipes:', error)
   }
 
-  // Execute query with pagination
-  const { data: recipes, count } = await query
-    .order('created_at', { ascending: false })
-    .range((currentPage - 1) * RECIPES_PER_PAGE, currentPage * RECIPES_PER_PAGE - 1)
+  const recipesData = (recipes || []) as RecipeWithSocialData[]
 
-  const recipesData = (recipes || []) as unknown as RecipeWithAuthor[]
+  // For pagination with search, count matching recipes
+  let countQuery = supabase.from('recipes').select('*', { count: 'exact', head: true })
+
+  if (searchQuery) {
+    countQuery = countQuery.ilike('title', `%${searchQuery}%`)
+  }
+
+  const { count } = await countQuery
   const totalPages = count ? Math.ceil(count / RECIPES_PER_PAGE) : 1
   const hasMore = currentPage < totalPages
 

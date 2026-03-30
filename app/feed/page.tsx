@@ -3,11 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
-import type { Recipe, Profile } from '@/lib/types/recipe'
-
-interface RecipeWithAuthor extends Recipe {
-  author: Profile
-}
+import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
 
@@ -28,22 +24,26 @@ export default async function FeedPage({
     redirect('/auth')
   }
 
-  // Fetch recipes with pagination
-  // NOTE: Query is structured to easily add friend filtering later:
-  // Just add: .in('author_id', friendIds) or similar WHERE clause
-  const { data: recipes, count } = await supabase
-    .from('recipes')
-    .select(
-      `
-      *,
-      author:profiles(*)
-    `,
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false })
-    .range((currentPage - 1) * RECIPES_PER_PAGE, currentPage * RECIPES_PER_PAGE - 1)
+  // Fetch recipes using database function with social data
+  // NOTE: Function is structured to easily add friend filtering later
+  const { data: recipes, error } = await supabase.rpc('get_feed_recipes', {
+    p_user_id: user.id,
+    p_limit: RECIPES_PER_PAGE,
+    p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
+    p_search_query: null,
+  })
 
-  const recipesData = (recipes || []) as unknown as RecipeWithAuthor[]
+  if (error) {
+    console.error('Error fetching recipes:', error)
+  }
+
+  const recipesData = (recipes || []) as RecipeWithSocialData[]
+
+  // For pagination, we need a total count - let's get it separately
+  const { count } = await supabase
+    .from('recipes')
+    .select('*', { count: 'exact', head: true })
+
   const totalPages = count ? Math.ceil(count / RECIPES_PER_PAGE) : 1
   const hasMore = currentPage < totalPages
 
