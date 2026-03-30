@@ -201,13 +201,20 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
               Like
             </span>
           </button>
-          <button
+          <Link
+            href={`/recipes/${recipe.id}#comments`}
             className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
             aria-label="Comment on recipe"
+            onClick={(e) => e.stopPropagation()}
           >
             <span className="text-xl">💬</span>
-            <span className="text-sm font-medium">Comment</span>
-          </button>
+            <span className="text-sm font-medium">
+              {recipe.comment_count > 0 && (
+                <span className="mr-1">{recipe.comment_count}</span>
+              )}
+              Comment
+            </span>
+          </Link>
           <button
             onClick={handleBookmark}
             className={`flex items-center gap-2 transition-colors ${

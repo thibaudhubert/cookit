@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import DeleteRecipeButton from '@/components/DeleteRecipeButton'
+import CommentSection from '@/components/CommentSection'
 import type { RecipeWithDetails } from '@/lib/types/recipe'
 
 interface PageProps {
@@ -43,6 +44,20 @@ export default async function RecipePage({ params }: PageProps) {
 
   const recipeData = recipe as unknown as RecipeWithDetails
   const isOwner = user.id === recipeData.author_id
+
+  // Fetch comments for this recipe
+  const { data: comments } = await supabase
+    .from('comments')
+    .select(
+      `
+      *,
+      author:profiles(username, display_name, avatar_url)
+    `
+    )
+    .eq('recipe_id', id)
+    .order('created_at', { ascending: true })
+
+  const commentsData = (comments || []) as any[]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -199,6 +214,14 @@ export default async function RecipePage({ params }: PageProps) {
             ))}
           </div>
         </div>
+
+        {/* Comments */}
+        <CommentSection
+          recipeId={id}
+          recipeAuthorId={recipeData.author_id}
+          currentUserId={user.id}
+          initialComments={commentsData}
+        />
       </main>
     </div>
   )
