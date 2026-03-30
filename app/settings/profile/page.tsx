@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import ProfileEditForm from '@/components/ProfileEditForm'
+import NotificationBell from '@/components/NotificationBell'
 import type { Profile } from '@/lib/types/recipe'
 
 export default async function ProfileSettingsPage() {
@@ -48,6 +49,7 @@ export default async function ProfileSettingsPage() {
               <Link href="/friends" className="text-gray-600 hover:text-gray-900">
                 Friends
               </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </Link>

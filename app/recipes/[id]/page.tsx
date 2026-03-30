@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import DeleteRecipeButton from '@/components/DeleteRecipeButton'
 import CommentSection from '@/components/CommentSection'
+import NotificationBell from '@/components/NotificationBell'
 import type { RecipeWithDetails } from '@/lib/types/recipe'
 
 interface PageProps {
@@ -73,6 +74,13 @@ export default async function RecipePage({ params }: PageProps) {
               <Link href="/feed" className="text-gray-600 hover:text-gray-900">
                 Feed
               </Link>
+              <Link href="/explore" className="text-gray-600 hover:text-gray-900">
+                Explore
+              </Link>
+              <Link href="/friends" className="text-gray-600 hover:text-gray-900">
+                Friends
+              </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </Link>

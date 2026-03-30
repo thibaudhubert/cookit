@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import FriendshipButton from '@/components/FriendshipButton'
 import RecipeCardGrid from '@/components/RecipeCardGrid'
+import NotificationBell from '@/components/NotificationBell'
 import type { Profile, RecipeWithSocialData } from '@/lib/types/recipe'
 
 interface PageProps {
@@ -129,6 +130,7 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
               <Link href="/friends" className="text-gray-600 hover:text-gray-900">
                 Friends
               </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </Link>

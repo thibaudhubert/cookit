@@ -4,6 +4,7 @@ import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import SearchBar from '@/components/SearchBar'
+import NotificationBell from '@/components/NotificationBell'
 import type { RecipeWithSocialData, Profile } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
@@ -109,6 +110,7 @@ export default async function ExplorePage({
               <Link href="/friends" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Friends
               </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Profile
               </Link>

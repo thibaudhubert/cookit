@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
+import NotificationBell from '@/components/NotificationBell'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
@@ -76,6 +77,7 @@ export default async function FeedPage({
               <Link href="/friends" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Friends
               </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Profile
               </Link>

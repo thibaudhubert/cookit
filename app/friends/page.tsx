@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import FriendsList from '@/components/FriendsList'
 import FriendRequests from '@/components/FriendRequests'
+import NotificationBell from '@/components/NotificationBell'
 
 export default async function FriendsPage({
   searchParams,
@@ -68,6 +69,7 @@ export default async function FriendsPage({
               <Link href="/friends" className="text-gray-900 font-medium">
                 Friends
               </Link>
+              <NotificationBell />
               <Link href="/profile" className="text-gray-600 hover:text-gray-900">
                 Profile
               </Link>
