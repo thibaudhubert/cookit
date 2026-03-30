@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import DeleteRecipeButton from '@/components/DeleteRecipeButton'
 import CommentSection from '@/components/CommentSection'
 import NotificationBell from '@/components/NotificationBell'
@@ -8,6 +9,43 @@ import type { RecipeWithDetails } from '@/lib/types/recipe'
 
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { data: recipe } = await supabase
+    .from('recipes')
+    .select('title, description, image_url, author:profiles(display_name, username)')
+    .eq('id', id)
+    .single()
+
+  if (!recipe) {
+    return {
+      title: 'Recipe Not Found | Cookit',
+    }
+  }
+
+  const recipeData = recipe as any
+  const authorName = recipeData.author?.display_name || recipeData.author?.username || 'Cookit User'
+
+  return {
+    title: `${recipe.title} by ${authorName} | Cookit`,
+    description: recipe.description || `Check out this recipe by ${authorName} on Cookit`,
+    openGraph: {
+      title: recipe.title,
+      description: recipe.description || `A delicious recipe by ${authorName}`,
+      images: recipe.image_url ? [recipe.image_url] : [],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: recipe.title,
+      description: recipe.description || `A delicious recipe by ${authorName}`,
+      images: recipe.image_url ? [recipe.image_url] : [],
+    },
+  }
 }
 
 export default async function RecipePage({ params }: PageProps) {

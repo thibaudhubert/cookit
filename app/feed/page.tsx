@@ -4,6 +4,7 @@ import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import NotificationBell from '@/components/NotificationBell'
+import ThemeToggle from '@/components/ThemeToggle'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
@@ -57,9 +58,9 @@ export default async function FeedPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/feed" className="flex items-center gap-2">
@@ -68,23 +69,24 @@ export default async function FeedPage({
             </Link>
 
             <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="/feed" className="text-gray-900 font-medium text-sm sm:text-base">
+              <Link href="/feed" className="text-gray-900 dark:text-white font-medium text-sm sm:text-base">
                 Feed
               </Link>
-              <Link href="/explore" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+              <Link href="/explore" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
                 Explore
               </Link>
-              <Link href="/friends" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+              <Link href="/friends" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
                 Friends
               </Link>
               <NotificationBell />
-              <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+              <ThemeToggle />
+              <Link href="/profile" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
                 Profile
               </Link>
               <form action={handleSignOut}>
                 <button
                   type="submit"
-                  className="text-sm text-gray-600 hover:text-gray-900"
+                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                 >
                   Sign Out
                 </button>
