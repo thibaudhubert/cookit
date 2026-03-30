@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_PATHS = ['/feed', '/profile', '/recipes', '/explore']
+const PROTECTED_PATHS = ['/feed', '/profile']
 const AUTH_PATH = '/auth'
 const AUTH_CALLBACK_PATH = '/auth/callback'
 
@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
+        setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options)
           })
@@ -48,7 +48,6 @@ export async function proxy(request: NextRequest) {
       url.pathname = AUTH_PATH
       return NextResponse.redirect(url)
     }
-
     return NextResponse.next()
   }
 
