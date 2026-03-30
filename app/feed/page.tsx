@@ -5,6 +5,8 @@ import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import NotificationBell from '@/components/NotificationBell'
 import ThemeToggle from '@/components/ThemeToggle'
+import FeedEmpty from '@/components/FeedEmpty'
+import { getTrendingRecipes, getPopularCreators } from '@/lib/queries/trending'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
@@ -41,6 +43,18 @@ export default async function FeedPage({
   }
 
   const recipesData = (recipes || []) as RecipeWithSocialData[]
+
+  // Fetch user profile for personalization
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name, username')
+    .eq('id', user.id)
+    .single()
+
+  // If feed is empty on first page, fetch trending content for empty state
+  const showEmptyState = recipesData.length === 0 && currentPage === 1
+  const trendingRecipes = showEmptyState ? await getTrendingRecipes(6) : []
+  const popularCreators = showEmptyState ? await getPopularCreators(6) : []
 
   // For pagination, we need a total count - let's get it separately
   const { count } = await supabase
@@ -111,17 +125,19 @@ export default async function FeedPage({
 
         {/* Recipe Feed */}
         {recipesData.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <p className="text-gray-500 mb-4">
-              No recipes yet. Be the first to share a recipe!
-            </p>
-            <Link
-              href="/recipes/new"
-              className="inline-block px-6 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800"
-            >
-              Create Your First Recipe
-            </Link>
-          </div>
+          showEmptyState ? (
+            <FeedEmpty
+              userName={profile?.display_name || profile?.username}
+              trendingRecipes={trendingRecipes}
+              popularCreators={popularCreators}
+            />
+          ) : (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                No more recipes to show.
+              </p>
+            </div>
+          )
         ) : (
           <div className="space-y-6">
             {recipesData.map((recipe) => (
