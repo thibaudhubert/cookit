@@ -76,6 +76,9 @@ export default async function ExplorePage({
               <Link href="/explore" className="text-gray-900 font-medium text-sm sm:text-base">
                 Explore
               </Link>
+              <Link href="/friends" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+                Friends
+              </Link>
               <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Profile
               </Link>

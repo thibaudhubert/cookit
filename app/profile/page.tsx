@@ -35,6 +35,12 @@ export default async function ProfilePage() {
               <Link href="/feed" className="text-gray-600 hover:text-gray-900">
                 Feed
               </Link>
+              <Link href="/explore" className="text-gray-600 hover:text-gray-900">
+                Explore
+              </Link>
+              <Link href="/friends" className="text-gray-600 hover:text-gray-900">
+                Friends
+              </Link>
               <Link href="/profile" className="text-gray-900 font-medium">
                 Profile
               </Link>
