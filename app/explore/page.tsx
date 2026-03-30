@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
+import SearchBar from '@/components/SearchBar'
 import type { Recipe, Profile } from '@/lib/types/recipe'
 
 interface RecipeWithAuthor extends Recipe {
@@ -11,14 +12,15 @@ interface RecipeWithAuthor extends Recipe {
 
 const RECIPES_PER_PAGE = 20
 
-export default async function FeedPage({
+export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; q?: string }>
 }) {
   const supabase = await createClient()
   const params = await searchParams
   const currentPage = parseInt(params.page || '1', 10)
+  const searchQuery = params.q || ''
 
   const {
     data: { user },
@@ -28,10 +30,8 @@ export default async function FeedPage({
     redirect('/auth')
   }
 
-  // Fetch recipes with pagination
-  // NOTE: Query is structured to easily add friend filtering later:
-  // Just add: .in('author_id', friendIds) or similar WHERE clause
-  const { data: recipes, count } = await supabase
+  // Build query with optional search filter
+  let query = supabase
     .from('recipes')
     .select(
       `
@@ -40,6 +40,14 @@ export default async function FeedPage({
     `,
       { count: 'exact' }
     )
+
+  // Add search filter if query exists
+  if (searchQuery) {
+    query = query.ilike('title', `%${searchQuery}%`)
+  }
+
+  // Execute query with pagination
+  const { data: recipes, count } = await query
     .order('created_at', { ascending: false })
     .range((currentPage - 1) * RECIPES_PER_PAGE, currentPage * RECIPES_PER_PAGE - 1)
 
@@ -66,10 +74,10 @@ export default async function FeedPage({
             </Link>
 
             <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="/feed" className="text-gray-900 font-medium text-sm sm:text-base">
+              <Link href="/feed" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
                 Feed
               </Link>
-              <Link href="/explore" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+              <Link href="/explore" className="text-gray-900 font-medium text-sm sm:text-base">
                 Explore
               </Link>
               <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
@@ -90,29 +98,49 @@ export default async function FeedPage({
 
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Create Button */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Feed</h1>
-          <Link
-            href="/recipes/new"
-            className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 text-sm sm:text-base"
-          >
-            + Create
-          </Link>
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Explore Recipes</h1>
+          <SearchBar initialQuery={searchQuery} />
         </div>
+
+        {/* Search Results Info */}
+        {searchQuery && (
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">
+              {count === 0 ? (
+                <>No results found for &quot;{searchQuery}&quot;</>
+              ) : count === 1 ? (
+                <>1 result for &quot;{searchQuery}&quot;</>
+              ) : (
+                <>{count} results for &quot;{searchQuery}&quot;</>
+              )}
+            </p>
+            <Link
+              href="/explore"
+              className="text-sm text-gray-900 hover:underline font-medium"
+            >
+              Clear search
+            </Link>
+          </div>
+        )}
 
         {/* Recipe Feed */}
         {recipesData.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <p className="text-gray-500 mb-4">
-              No recipes yet. Be the first to share a recipe!
+              {searchQuery
+                ? 'No recipes found matching your search.'
+                : 'No recipes yet. Be the first to share a recipe!'}
             </p>
-            <Link
-              href="/recipes/new"
-              className="inline-block px-6 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800"
-            >
-              Create Your First Recipe
-            </Link>
+            {!searchQuery && (
+              <Link
+                href="/recipes/new"
+                className="inline-block px-6 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800"
+              >
+                Create Your First Recipe
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
@@ -125,7 +153,7 @@ export default async function FeedPage({
               <LoadMoreButton currentPage={currentPage} totalPages={totalPages} />
             )}
 
-            {/* End of Feed */}
+            {/* End of Results */}
             {!hasMore && recipesData.length > 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500 text-sm">You've reached the end!</p>
