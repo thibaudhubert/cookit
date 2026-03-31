@@ -23,6 +23,6 @@ export default async function ProfilePage() {
     redirect(`/profile/${profile.username}`)
   }
 
-  // Fallback if no username found (shouldn't happen)
-  redirect('/feed')
+  // Fallback if no username found - use ID-based profile
+  redirect(`/profile/id/${user.id}`)
 }
