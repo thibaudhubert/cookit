@@ -7,30 +7,33 @@ export default function QuickActions() {
       title: 'Create a Recipe',
       description: 'Share your culinary creations',
       href: '/recipes/new',
-      color: 'from-blue-50 to-blue-100 border-blue-200',
+      gradient: 'from-blue-50 to-indigo-50',
+      border: 'border-blue-100',
     },
     {
       icon: '🔍',
       title: 'Explore Recipes',
       description: 'Discover delicious dishes',
       href: '/explore',
-      color: 'from-green-50 to-green-100 border-green-200',
+      gradient: 'from-green-50 to-emerald-50',
+      border: 'border-green-100',
     },
     {
       icon: '👥',
       title: 'Find Friends',
       description: 'Connect with other cooks',
       href: '/explore?mode=people',
-      color: 'from-purple-50 to-purple-100 border-purple-200',
+      gradient: 'from-purple-50 to-pink-50',
+      border: 'border-purple-100',
     },
   ]
 
   return (
-    <div className="mb-8">
-      <h2 className="text-lg font-semibold text-text-primary mb-4">
+    <div className="mb-10">
+      <h2 className="text-2xl font-bold text-text-primary tracking-tight mb-6">
         Quick Actions
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {actions.map((action) => (
           <Link
             key={action.href}
@@ -38,13 +41,13 @@ export default function QuickActions() {
             className="group block"
           >
             <div
-              className={`bg-gradient-to-br ${action.color} rounded-xl p-6 border transition-all hover:shadow-md hover:scale-[1.02]`}
+              className={`bg-gradient-to-br ${action.gradient} ${action.border} rounded-2xl p-7 border shadow-apple hover:shadow-apple-lg transition-all duration-200 hover:scale-[1.02]`}
             >
-              <div className="text-3xl mb-3">{action.icon}</div>
-              <h3 className="font-semibold text-text-primary mb-1 group-hover:text-accent">
+              <div className="text-4xl mb-4">{action.icon}</div>
+              <h3 className="font-semibold text-text-primary text-lg mb-2 group-hover:text-accent transition-colors">
                 {action.title}
               </h3>
-              <p className="text-sm text-text-secondary">
+              <p className="text-base text-text-secondary">
                 {action.description}
               </p>
             </div>

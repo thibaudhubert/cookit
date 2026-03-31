@@ -18,15 +18,15 @@ const maxWidthClasses = {
 export default function Layout({ header, children, maxWidth = 'lg' }: LayoutProps) {
   return (
     <div className="min-h-screen bg-app">
-      {/* Header with sticky positioning */}
-      <header className="bg-surface border-b border-border sticky top-0 z-10">
+      {/* Apple-style header: white, opaque, with subtle shadow */}
+      <header className="bg-white/95 backdrop-blur-apple border-b border-border sticky top-0 z-50 shadow-sm">
         <div className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8`}>
           {header}
         </div>
       </header>
 
-      {/* Main content */}
-      <main className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-8`}>
+      {/* Main content with generous spacing */}
+      <main className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-12`}>
         {children}
       </main>
     </div>
