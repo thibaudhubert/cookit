@@ -4,7 +4,8 @@ import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import SearchBar from '@/components/SearchBar'
-import NotificationBell from '@/components/NotificationBell'
+import Layout from '@/components/ui/Layout'
+import AppHeader from '@/components/ui/AppHeader'
 import type { RecipeWithSocialData, Profile } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
@@ -90,69 +91,31 @@ export default async function ExplorePage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/feed" className="flex items-center gap-2">
-              <span className="text-2xl">🍴</span>
-              <span className="text-xl font-bold text-gray-900">Cookit</span>
-            </Link>
-
-            <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="/feed" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
-                Feed
-              </Link>
-              <Link href="/explore" className="text-gray-900 font-medium text-sm sm:text-base">
-                Explore
-              </Link>
-              <Link href="/friends" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
-                Friends
-              </Link>
-              <NotificationBell />
-              <Link href="/profile" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
-                Profile
-              </Link>
-              <form action={handleSignOut}>
-                <button
-                  type="submit"
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  Sign Out
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <Layout maxWidth="md" header={<AppHeader onSignOut={handleSignOut} />}>
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight mb-6">
             Explore {mode === 'recipes' ? 'Recipes' : 'People'}
           </h1>
 
           {/* Mode Toggle */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-3 mb-6">
             <Link
               href={`/explore?mode=recipes${searchQuery ? `&q=${searchQuery}` : ''}`}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
                 mode === 'recipes'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-accent text-white shadow-apple-lg active:scale-[0.98]'
+                  : 'bg-surface text-text-secondary hover:bg-surface-hover border border-border shadow-apple hover:shadow-apple-lg'
               }`}
             >
               Recipes
             </Link>
             <Link
               href={`/explore?mode=people${searchQuery ? `&q=${searchQuery}` : ''}`}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
                 mode === 'people'
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-accent text-white shadow-apple-lg active:scale-[0.98]'
+                  : 'bg-surface text-text-secondary hover:bg-surface-hover border border-border shadow-apple hover:shadow-apple-lg'
               }`}
             >
               People
@@ -164,8 +127,8 @@ export default async function ExplorePage({
 
         {/* Search Results Info */}
         {searchQuery && (
-          <div className="mb-4">
-            <p className="text-sm text-gray-600">
+          <div className="mb-6">
+            <p className="text-base text-text-secondary mb-2">
               {count === 0 ? (
                 <>No results found for &quot;{searchQuery}&quot;</>
               ) : count === 1 ? (
@@ -176,7 +139,7 @@ export default async function ExplorePage({
             </p>
             <Link
               href={`/explore?mode=${mode}`}
-              className="text-sm text-gray-900 hover:underline font-medium"
+              className="text-base text-accent hover:text-accent-hover font-medium transition-colors"
             >
               Clear search
             </Link>
@@ -187,8 +150,9 @@ export default async function ExplorePage({
         {mode === 'recipes' && (
           <>
             {recipesData.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-gray-500 mb-4">
+              <div className="bg-surface rounded-2xl shadow-apple p-12 text-center border border-border">
+                <div className="text-6xl mb-6">🔍</div>
+                <p className="text-lg text-text-secondary mb-6">
                   {searchQuery
                     ? 'No recipes found matching your search.'
                     : 'No recipes yet. Be the first to share a recipe!'}
@@ -196,7 +160,7 @@ export default async function ExplorePage({
                 {!searchQuery && (
                   <Link
                     href="/recipes/new"
-                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800"
+                    className="inline-block px-6 py-3 bg-accent text-white rounded-xl hover:bg-accent-hover shadow-apple-lg font-semibold active:scale-[0.98] transition-all duration-200"
                   >
                     Create Your First Recipe
                   </Link>
@@ -214,7 +178,7 @@ export default async function ExplorePage({
                 {/* End of Results */}
                 {!hasMore && recipesData.length > 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 text-sm">You've reached the end!</p>
+                    <p className="text-text-muted text-sm">You've reached the end!</p>
                   </div>
                 )}
               </div>
@@ -226,37 +190,38 @@ export default async function ExplorePage({
         {mode === 'people' && (
           <>
             {peopleData.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-gray-500">
+              <div className="bg-surface rounded-2xl shadow-apple p-12 text-center border border-border">
+                <div className="text-6xl mb-6">👥</div>
+                <p className="text-lg text-text-secondary">
                   {searchQuery ? 'No people found matching your search.' : 'No users to show.'}
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {peopleData.map((person) => (
                   <Link
                     key={person.id}
                     href={`/profile/${person.username}`}
-                    className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    className="flex items-center gap-5 p-5 bg-surface rounded-2xl shadow-apple hover:shadow-apple-lg transition-all duration-200 border border-border hover:scale-[1.01]"
                   >
                     {person.avatar_url ? (
                       <img
                         src={person.avatar_url}
                         alt={person.display_name || person.username}
-                        className="w-16 h-16 rounded-full object-cover"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-border-light"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center border-2 border-border-light">
                         <span className="text-2xl">👤</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">
+                      <p className="font-semibold text-text-primary text-base mb-1 truncate">
                         {person.display_name || person.username}
                       </p>
-                      <p className="text-sm text-gray-500 truncate">@{person.username}</p>
+                      <p className="text-sm text-text-muted truncate">@{person.username}</p>
                       {person.bio && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{person.bio}</p>
+                        <p className="text-sm text-text-secondary mt-2 line-clamp-2">{person.bio}</p>
                       )}
                     </div>
                   </Link>
@@ -268,14 +233,13 @@ export default async function ExplorePage({
                 {/* End of Results */}
                 {!hasMore && peopleData.length > 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 text-sm">You've reached the end!</p>
+                    <p className="text-text-muted text-sm">You've reached the end!</p>
                   </div>
                 )}
               </div>
             )}
           </>
         )}
-      </main>
-    </div>
+    </Layout>
   )
 }

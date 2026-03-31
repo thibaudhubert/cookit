@@ -30,21 +30,21 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-app px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <span className="text-5xl">🍴</span>
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 mb-6">
+            <span className="text-7xl">🍴</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome to Cookit</h1>
-          <p className="text-gray-600 mt-2">Sign in to start sharing recipes</p>
+          <h1 className="text-4xl font-bold text-text-primary tracking-tight mb-3">Welcome to Cookit</h1>
+          <p className="text-lg text-text-secondary">Sign in to start sharing recipes</p>
         </div>
 
         {/* Auth Card */}
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-surface rounded-2xl shadow-apple-lg p-10 border border-border-light">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
@@ -52,7 +52,7 @@ export default function AuthPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-surface border border-border rounded-xl hover:bg-surface-hover shadow-apple hover:shadow-apple-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -72,12 +72,12 @@ export default function AuthPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            <span className="font-medium text-gray-700">
+            <span className="text-text-primary">
               {loading ? 'Signing in...' : 'Continue with Google'}
             </span>
           </button>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-text-muted mt-8">
             By signing in, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

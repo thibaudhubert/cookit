@@ -100,7 +100,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-surface rounded-2xl shadow-apple overflow-hidden hover:shadow-apple-lg transition-all duration-200 border border-border">
       {/* Author Header */}
       <div className="p-4 flex items-center gap-3">
         <Link href={`/profile/${recipe.author_username}`}>
@@ -111,7 +111,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
               className="w-10 h-10 rounded-full object-cover hover:opacity-80 transition-opacity"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors border-2 border-border-light">
               <span className="text-lg">👤</span>
             </div>
           )}
@@ -119,11 +119,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         <div className="flex-1 min-w-0">
           <Link
             href={`/profile/${recipe.author_username}`}
-            className="font-semibold text-gray-900 hover:underline block truncate"
+            className="font-semibold text-text-primary hover:text-accent block truncate transition-colors"
           >
             {recipe.author_display_name || recipe.author_username}
           </Link>
-          <p className="text-sm text-gray-500">{timeAgo(recipe.created_at)}</p>
+          <p className="text-sm text-text-muted">{timeAgo(recipe.created_at)}</p>
         </div>
       </div>
 
@@ -145,13 +145,13 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       {/* Recipe Content */}
       <div className="p-4">
         <Link href={`/recipes/${recipe.id}`}>
-          <h3 className="text-xl font-bold text-gray-900 mb-2 hover:underline line-clamp-2">
+          <h3 className="text-xl font-bold text-text-primary mb-2 hover:text-accent line-clamp-2 transition-colors">
             {recipe.title}
           </h3>
         </Link>
 
         {recipe.description && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+          <p className="text-text-secondary text-sm mb-4 line-clamp-2">
             {recipe.description}
           </p>
         )}
@@ -159,12 +159,12 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         {/* Metadata Pills */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           {totalTime > 0 && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-text-secondary rounded-full text-xs font-medium">
               ⏱️ {totalTime} min
             </span>
           )}
           {recipe.servings && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-text-secondary rounded-full text-xs font-medium">
               🍽️ {recipe.servings} {recipe.servings === 1 ? 'serving' : 'servings'}
             </span>
           )}
@@ -187,11 +187,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-6 pt-3 border-t border-gray-100">
+        <div className="flex items-center gap-6 pt-3 border-t border-border">
           <button
             onClick={handleLike}
             className={`flex items-center gap-2 transition-colors ${
-              isLiked ? 'text-red-500' : 'text-gray-600 hover:text-red-500'
+              isLiked ? 'text-red-500' : 'text-text-secondary hover:text-red-500'
             }`}
             aria-label={isLiked ? 'Unlike recipe' : 'Like recipe'}
           >
@@ -203,7 +203,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           </button>
           <Link
             href={`/recipes/${recipe.id}#comments`}
-            className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
+            className="flex items-center gap-2 text-text-secondary hover:text-accent transition-colors"
             aria-label="Comment on recipe"
             onClick={(e) => e.stopPropagation()}
           >
@@ -218,7 +218,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           <button
             onClick={handleBookmark}
             className={`flex items-center gap-2 transition-colors ${
-              isBookmarked ? 'text-amber-500' : 'text-gray-600 hover:text-amber-500'
+              isBookmarked ? 'text-amber-500' : 'text-text-secondary hover:text-amber-500'
             }`}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark recipe'}
           >
