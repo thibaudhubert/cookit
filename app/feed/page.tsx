@@ -5,7 +5,7 @@ import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import FeedEmpty from '@/components/FeedEmpty'
 import AppHeader from '@/components/ui/AppHeader'
-import AppShell from '@/components/ui/AppShell'
+import Layout from '@/components/ui/Layout'
 import PageHeader from '@/components/ui/PageHeader'
 import Button from '@/components/ui/Button'
 import EmptyState from '@/components/ui/EmptyState'
@@ -75,49 +75,49 @@ export default async function FeedPage({
   }
 
   return (
-    <>
-      <AppHeader onSignOut={handleSignOut} />
-      <AppShell maxWidth="md">
-        <PageHeader
-          title="Your Feed"
-          action={
-            <Link href="/recipes/new">
-              <Button>+ Create</Button>
-            </Link>
-          }
-        />
+    <Layout
+      maxWidth="md"
+      header={<AppHeader onSignOut={handleSignOut} />}
+    >
+      <PageHeader
+        title="Your Feed"
+        action={
+          <Link href="/recipes/new">
+            <Button>+ Create</Button>
+          </Link>
+        }
+      />
 
-        {recipesData.length === 0 ? (
-          showEmptyState ? (
-            <FeedEmpty
-              userName={profile?.display_name || profile?.username}
-              trendingRecipes={trendingRecipes}
-              popularCreators={popularCreators}
-            />
-          ) : (
-            <EmptyState
-              title="No more recipes"
-              description="You've reached the end of your feed."
-            />
-          )
+      {recipesData.length === 0 ? (
+        showEmptyState ? (
+          <FeedEmpty
+            userName={profile?.display_name || profile?.username}
+            trendingRecipes={trendingRecipes}
+            popularCreators={popularCreators}
+          />
         ) : (
-          <div className="space-y-6">
-            {recipesData.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
+          <EmptyState
+            title="No more recipes"
+            description="You've reached the end of your feed."
+          />
+        )
+      ) : (
+        <div className="space-y-6">
+          {recipesData.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
 
-            {hasMore && (
-              <LoadMoreButton currentPage={currentPage} totalPages={totalPages} />
-            )}
+          {hasMore && (
+            <LoadMoreButton currentPage={currentPage} totalPages={totalPages} />
+          )}
 
-            {!hasMore && recipesData.length > 0 && (
-              <div className="text-center py-8">
-                <p className="text-text-muted text-sm">You've reached the end!</p>
-              </div>
-            )}
-          </div>
-        )}
-      </AppShell>
-    </>
+          {!hasMore && recipesData.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-text-muted text-sm">You've reached the end!</p>
+            </div>
+          )}
+        </div>
+      )}
+    </Layout>
   )
 }
