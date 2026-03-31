@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import Button from '@/components/ui/Button'
 
 interface FriendshipButtonProps {
   targetUserId: string
@@ -114,44 +115,48 @@ export default function FriendshipButton({
 
   if (status === 'none') {
     return (
-      <button
+      <Button
         onClick={handleSendRequest}
         disabled={isLoading}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        variant="primary"
+        size="md"
       >
         {isLoading ? 'Sending...' : 'Add Friend'}
-      </button>
+      </Button>
     )
   }
 
   if (status === 'pending_sent') {
     return (
-      <button
+      <Button
         disabled
-        className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md cursor-not-allowed"
+        variant="outline"
+        size="md"
       >
         Request Sent
-      </button>
+      </Button>
     )
   }
 
   if (status === 'pending_received') {
     return (
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={handleAccept}
           disabled={isLoading}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="success"
+          size="md"
         >
           {isLoading ? 'Accepting...' : 'Accept'}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleDecline}
           disabled={isLoading}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="outline"
+          size="md"
         >
           {isLoading ? 'Declining...' : 'Decline'}
-        </button>
+        </Button>
       </div>
     )
   }
@@ -159,19 +164,21 @@ export default function FriendshipButton({
   if (status === 'friends') {
     return (
       <div className="relative">
-        <button
+        <Button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 flex items-center gap-2"
+          variant="outline"
+          size="md"
+          className="gap-2"
         >
           <span>Friends ✓</span>
           <span className="text-xs">▼</span>
-        </button>
+        </Button>
         {showDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+          <div className="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-apple-lg border border-border z-10 overflow-hidden">
             <button
               onClick={handleRemove}
               disabled={isLoading}
-              className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed font-semibold"
             >
               {isLoading ? 'Removing...' : 'Remove Friend'}
             </button>

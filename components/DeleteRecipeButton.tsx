@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import Button from '@/components/ui/Button'
 
 interface DeleteRecipeButtonProps {
   recipeId: string
@@ -40,29 +41,31 @@ export default function DeleteRecipeButton({
   if (showConfirm) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-        <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="bg-surface rounded-2xl p-8 max-w-sm w-full shadow-apple-xl border border-border">
+          <h3 className="text-xl font-bold text-text-primary mb-3">
             Delete Recipe?
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-base text-text-secondary mb-8">
             This action cannot be undone. The recipe and all its data will be
             permanently deleted.
           </p>
           <div className="flex gap-3 justify-end">
-            <button
+            <Button
               onClick={() => setShowConfirm(false)}
               disabled={deleting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              variant="outline"
+              size="md"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleDelete}
               disabled={deleting}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              variant="destructive"
+              size="md"
             >
               {deleting ? 'Deleting...' : 'Delete'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -70,11 +73,12 @@ export default function DeleteRecipeButton({
   }
 
   return (
-    <button
+    <Button
       onClick={() => setShowConfirm(true)}
-      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+      variant="destructive"
+      size="sm"
     >
       Delete
-    </button>
+    </Button>
   )
 }
