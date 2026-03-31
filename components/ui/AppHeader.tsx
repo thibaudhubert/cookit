@@ -15,7 +15,6 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
   const navItems = [
     { href: '/feed', label: 'Feed' },
     { href: '/explore', label: 'Explore' },
-    { href: '/friends', label: 'Friends' },
     { href: '/profile', label: 'Profile' },
   ]
 

@@ -4,12 +4,14 @@ import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import SearchBar from '@/components/SearchBar'
+import TrendingRecipes from '@/components/TrendingRecipes'
 import Layout from '@/components/ui/Layout'
 import AppHeader from '@/components/ui/AppHeader'
 import type { RecipeWithSocialData, Profile } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
 const PEOPLE_PER_PAGE = 20
+const TRENDING_LIMIT = 8
 
 export default async function ExplorePage({
   searchParams,
@@ -28,6 +30,21 @@ export default async function ExplorePage({
 
   if (!user) {
     redirect('/auth')
+  }
+
+  // Fetch trending recipes (top liked recipes for the last 7 days)
+  let trendingRecipes: RecipeWithSocialData[] = []
+  if (mode === 'recipes' && !searchQuery) {
+    const { data: trending } = await supabase.rpc('get_feed_recipes', {
+      p_user_id: user.id,
+      p_limit: TRENDING_LIMIT,
+      p_offset: 0,
+      p_search_query: null,
+    })
+    // Sort by like count to get trending
+    trendingRecipes = ((trending || []) as RecipeWithSocialData[])
+      .sort((a, b) => b.like_count - a.like_count)
+      .slice(0, TRENDING_LIMIT)
   }
 
   let recipesData: RecipeWithSocialData[] = []
@@ -144,6 +161,11 @@ export default async function ExplorePage({
               Clear search
             </Link>
           </div>
+        )}
+
+        {/* Trending Recipes */}
+        {mode === 'recipes' && !searchQuery && trendingRecipes.length > 0 && (
+          <TrendingRecipes recipes={trendingRecipes} />
         )}
 
         {/* Recipe Feed */}
