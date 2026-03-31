@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import DeleteRecipeButton from '@/components/DeleteRecipeButton'
 import CommentSection from '@/components/CommentSection'
+import RecipeImage from '@/components/RecipeImage'
 import Layout from '@/components/ui/Layout'
 import AppHeader from '@/components/ui/AppHeader'
 import type { RecipeWithDetails } from '@/lib/types/recipe'
@@ -127,15 +128,15 @@ export default async function RecipePage({ params }: PageProps) {
   return (
     <Layout maxWidth="lg" header={<AppHeader onSignOut={handleSignOut} />}>
         {/* Hero Image */}
-        {recipeData.image_url && (
-          <div className="mb-10">
-            <img
-              src={recipeData.image_url}
-              alt={recipeData.title}
-              className="w-full h-96 object-cover rounded-2xl shadow-apple-lg"
-            />
-          </div>
-        )}
+        <div className="mb-10">
+          <RecipeImage
+            src={recipeData.image_url}
+            alt={recipeData.title}
+            className="w-full h-96 object-cover rounded-2xl shadow-apple-lg"
+            fallbackClassName="w-full h-96 rounded-2xl"
+            fallbackSize="large"
+          />
+        </div>
 
         {/* Recipe Header */}
         <div className="bg-surface rounded-2xl shadow-apple p-10 mb-8 border border-border">

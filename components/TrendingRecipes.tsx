@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import RecipeImage from '@/components/RecipeImage'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 interface TrendingRecipesProps {
@@ -41,19 +42,15 @@ export default function TrendingRecipes({ recipes }: TrendingRecipesProps) {
             >
               <div className="bg-surface rounded-2xl overflow-hidden shadow-apple hover:shadow-apple-lg transition-all duration-200 border border-border hover:scale-[1.02]">
                 {/* Image */}
-                {recipe.image_url ? (
-                  <div className="aspect-square w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={recipe.image_url}
-                      alt={recipe.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-square w-full bg-gray-100 flex items-center justify-center">
-                    <span className="text-5xl">🍴</span>
-                  </div>
-                )}
+                <div className="aspect-square w-full overflow-hidden">
+                  <RecipeImage
+                    src={recipe.image_url}
+                    alt={recipe.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fallbackClassName="aspect-square w-full"
+                    fallbackSize="medium"
+                  />
+                </div>
 
                 {/* Info */}
                 <div className="p-4">

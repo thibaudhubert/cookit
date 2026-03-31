@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
+import RecipeImage from '@/components/RecipeImage'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 interface RecipeCardProps {
@@ -129,17 +130,13 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
       {/* Recipe Image */}
       <Link href={`/recipes/${recipe.id}`}>
-        {recipe.image_url ? (
-          <img
-            src={recipe.image_url}
-            alt={recipe.title}
-            className="w-full h-80 object-cover hover:opacity-95 transition-opacity"
-          />
-        ) : (
-          <div className="w-full h-80 bg-gray-100 flex items-center justify-center">
-            <span className="text-8xl">🍴</span>
-          </div>
-        )}
+        <RecipeImage
+          src={recipe.image_url}
+          alt={recipe.title}
+          className="w-full h-80 object-cover hover:opacity-95 transition-opacity"
+          fallbackClassName="w-full h-80"
+          fallbackSize="large"
+        />
       </Link>
 
       {/* Recipe Content */}

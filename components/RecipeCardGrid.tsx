@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import RecipeImage from '@/components/RecipeImage'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 interface RecipeCardGridProps {
@@ -23,19 +24,15 @@ export default function RecipeCardGrid({ recipes }: RecipeCardGridProps) {
           className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
         >
           {/* Recipe Image */}
-          {recipe.image_url ? (
-            <div className="aspect-square w-full overflow-hidden bg-gray-100">
-              <img
-                src={recipe.image_url}
-                alt={recipe.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-            </div>
-          ) : (
-            <div className="aspect-square w-full bg-gray-100 flex items-center justify-center">
-              <span className="text-6xl">🍴</span>
-            </div>
-          )}
+          <div className="aspect-square w-full overflow-hidden">
+            <RecipeImage
+              src={recipe.image_url}
+              alt={recipe.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              fallbackClassName="aspect-square w-full"
+              fallbackSize="medium"
+            />
+          </div>
 
           {/* Recipe Info */}
           <div className="p-4">
