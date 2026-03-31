@@ -1,0 +1,2 @@
+-- This migration intentionally left empty
+-- Seed data will be added via script after creating actual auth users
