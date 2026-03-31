@@ -16,13 +16,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: recipe } = await supabase
+  const { data: recipe, error } = await supabase
     .from('recipes')
-    .select('title, description, image_url, author:profiles(display_name, username)')
+    .select('title, description, image_url, author:profiles!recipes_author_id_fkey(display_name, username)')
     .eq('id', id)
     .single()
 
-  if (!recipe) {
+  if (error || !recipe) {
+    // Log errors for debugging but return fallback metadata
+    if (error) {
+      console.error('Error fetching recipe metadata:', error)
+    }
     return {
       title: 'Recipe Not Found | Cookit',
     }
@@ -63,12 +67,13 @@ export default async function RecipePage({ params }: PageProps) {
   }
 
   // Fetch recipe with all details
+  // Note: Use profiles!recipes_author_id_fkey to specify exact relationship
   const { data: recipe, error: recipeError } = await supabase
     .from('recipes')
     .select(
       `
       *,
-      author:profiles(*),
+      author:profiles!recipes_author_id_fkey(*),
       ingredients:recipe_ingredients(*),
       steps:recipe_steps(*)
     `
@@ -78,7 +83,20 @@ export default async function RecipePage({ params }: PageProps) {
     .order('position', { referencedTable: 'recipe_steps', ascending: true })
     .single()
 
-  if (recipeError || !recipe) {
+  // Handle errors properly - don't hide real errors behind 404
+  if (recipeError) {
+    // PGRST116 = "not found" error from PostgREST
+    if (recipeError.code === 'PGRST116') {
+      console.log(`Recipe not found: ${id}`)
+      notFound()
+    }
+    // Any other error is a real database/query error - surface it
+    console.error('Error fetching recipe:', recipeError)
+    throw new Error(`Failed to fetch recipe: ${recipeError.message}`)
+  }
+
+  if (!recipe) {
+    console.log(`Recipe returned null: ${id}`)
     notFound()
   }
 
@@ -204,41 +222,45 @@ export default async function RecipePage({ params }: PageProps) {
         </div>
 
         {/* Ingredients */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Ingredients</h2>
-          <ul className="space-y-2">
-            {recipeData.ingredients.map((ingredient) => (
-              <li key={ingredient.id} className="flex items-start">
-                <span className="text-gray-400 mr-3">•</span>
-                <span className="text-gray-700">{ingredient.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {recipeData.ingredients && recipeData.ingredients.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Ingredients</h2>
+            <ul className="space-y-2">
+              {recipeData.ingredients.map((ingredient) => (
+                <li key={ingredient.id} className="flex items-start">
+                  <span className="text-gray-400 mr-3">•</span>
+                  <span className="text-gray-700">{ingredient.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Steps */}
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Instructions</h2>
-          <div className="space-y-6">
-            {recipeData.steps.map((step, index) => (
-              <div key={step.id} className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-semibold">
-                  {index + 1}
+        {recipeData.steps && recipeData.steps.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Instructions</h2>
+            <div className="space-y-6">
+              {recipeData.steps.map((step, index) => (
+                <div key={step.id} className="flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-semibold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-700 mb-3">{step.instruction}</p>
+                    {step.image_url && (
+                      <img
+                        src={step.image_url}
+                        alt={`Step ${index + 1}`}
+                        className="w-full max-w-md h-48 object-cover rounded-md"
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-gray-700 mb-3">{step.instruction}</p>
-                  {step.image_url && (
-                    <img
-                      src={step.image_url}
-                      alt={`Step ${index + 1}`}
-                      className="w-full max-w-md h-48 object-cover rounded-md"
-                    />
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Comments */}
         <CommentSection
