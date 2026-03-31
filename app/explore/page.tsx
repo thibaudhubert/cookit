@@ -40,6 +40,7 @@ export default async function ExplorePage({
       p_limit: TRENDING_LIMIT,
       p_offset: 0,
       p_search_query: null,
+      p_friends_only: false,
     })
     // Sort by like count to get trending
     trendingRecipes = ((trending || []) as RecipeWithSocialData[])
@@ -59,6 +60,7 @@ export default async function ExplorePage({
       p_limit: RECIPES_PER_PAGE,
       p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
       p_search_query: searchQuery || null,
+      p_friends_only: false,
     })
 
     if (error) {
