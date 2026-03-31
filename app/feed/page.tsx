@@ -32,13 +32,13 @@ export default async function FeedPage({
   }
 
   // Fetch recipes using database function with social data
-  // Only show recipes from friends + own recipes
+  // Show all recipes (not just from friends)
   const { data: recipes, error } = await supabase.rpc('get_feed_recipes', {
     p_user_id: user.id,
     p_limit: RECIPES_PER_PAGE,
     p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
     p_search_query: null,
-    p_friends_only: true,
+    p_friends_only: false,
   })
 
   if (error) {
