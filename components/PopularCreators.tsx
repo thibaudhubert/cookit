@@ -39,7 +39,7 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xl">👥</span>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-xl font-bold text-text-primary">
           Popular Creators to Follow
         </h2>
       </div>
@@ -50,7 +50,7 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
           {creators.map((creator) => (
             <div
               key={creator.id}
-              className="w-[160px] flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 text-center"
+              className="w-[160px] flex-shrink-0 bg-surface rounded-lg p-4 shadow-sm border border-border text-center"
             >
               {/* Avatar */}
               <Link href={`/profile/${creator.username}`} className="block mb-3">
@@ -58,10 +58,10 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
                   <img
                     src={creator.avatar_url}
                     alt={creator.display_name || creator.username}
-                    className="w-16 h-16 rounded-full object-cover mx-auto border-2 border-gray-100 dark:border-gray-700"
+                    className="w-16 h-16 rounded-full object-cover mx-auto border-2 border-border-light"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
                     <span className="text-2xl">👤</span>
                   </div>
                 )}
@@ -70,16 +70,16 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
               {/* Name */}
               <Link
                 href={`/profile/${creator.username}`}
-                className="block font-semibold text-gray-900 dark:text-white text-sm mb-1 hover:text-blue-600 dark:hover:text-blue-400 truncate"
+                className="block font-semibold text-text-primary text-sm mb-1 hover:text-accent truncate"
               >
                 {creator.display_name || creator.username}
               </Link>
 
               {/* Username & Recipe Count */}
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 truncate">
+              <p className="text-xs text-text-muted mb-3 truncate">
                 @{creator.username}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+              <p className="text-xs text-text-secondary mb-3">
                 {creator.recipe_count} {creator.recipe_count === 1 ? 'recipe' : 'recipes'}
               </p>
 
@@ -89,8 +89,8 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
                 disabled={followingStates[creator.id] || loadingStates[creator.id]}
                 className={`w-full px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   followingStates[creator.id]
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50'
+                    ? 'bg-gray-200 text-text-muted cursor-not-allowed'
+                    : 'bg-accent text-white hover:bg-accent-hover disabled:opacity-50'
                 }`}
               >
                 {loadingStates[creator.id]

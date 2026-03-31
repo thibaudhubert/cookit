@@ -3,9 +3,12 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
-import NotificationBell from '@/components/NotificationBell'
-import ThemeToggle from '@/components/ThemeToggle'
 import FeedEmpty from '@/components/FeedEmpty'
+import AppHeader from '@/components/ui/AppHeader'
+import AppShell from '@/components/ui/AppShell'
+import PageHeader from '@/components/ui/PageHeader'
+import Button from '@/components/ui/Button'
+import EmptyState from '@/components/ui/EmptyState'
 import { getTrendingRecipes, getPopularCreators } from '@/lib/queries/trending'
 import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
@@ -72,58 +75,18 @@ export default async function FeedPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/feed" className="flex items-center gap-2">
-              <span className="text-2xl">🍴</span>
-              <span className="text-xl font-bold text-gray-900">Cookit</span>
+    <>
+      <AppHeader onSignOut={handleSignOut} />
+      <AppShell maxWidth="md">
+        <PageHeader
+          title="Your Feed"
+          action={
+            <Link href="/recipes/new">
+              <Button>+ Create</Button>
             </Link>
+          }
+        />
 
-            <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="/feed" className="text-gray-900 dark:text-white font-medium text-sm sm:text-base">
-                Feed
-              </Link>
-              <Link href="/explore" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
-                Explore
-              </Link>
-              <Link href="/friends" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
-                Friends
-              </Link>
-              <NotificationBell />
-              <ThemeToggle />
-              <Link href="/profile" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm sm:text-base">
-                Profile
-              </Link>
-              <form action={handleSignOut}>
-                <button
-                  type="submit"
-                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                >
-                  Sign Out
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Create Button */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Feed</h1>
-          <Link
-            href="/recipes/new"
-            className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 text-sm sm:text-base"
-          >
-            + Create
-          </Link>
-        </div>
-
-        {/* Recipe Feed */}
         {recipesData.length === 0 ? (
           showEmptyState ? (
             <FeedEmpty
@@ -132,11 +95,10 @@ export default async function FeedPage({
               popularCreators={popularCreators}
             />
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                No more recipes to show.
-              </p>
-            </div>
+            <EmptyState
+              title="No more recipes"
+              description="You've reached the end of your feed."
+            />
           )
         ) : (
           <div className="space-y-6">
@@ -144,20 +106,18 @@ export default async function FeedPage({
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
 
-            {/* Load More Button */}
             {hasMore && (
               <LoadMoreButton currentPage={currentPage} totalPages={totalPages} />
             )}
 
-            {/* End of Feed */}
             {!hasMore && recipesData.length > 0 && (
               <div className="text-center py-8">
-                <p className="text-gray-500 text-sm">You've reached the end!</p>
+                <p className="text-text-muted text-sm">You've reached the end!</p>
               </div>
             )}
           </div>
         )}
-      </main>
-    </div>
+      </AppShell>
+    </>
   )
 }

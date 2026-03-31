@@ -23,19 +23,19 @@ export default function FeedEmpty({ userName, trendingRecipes, popularCreators }
 
       {/* Dismissible Tip Card */}
       {showTip && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-8 flex items-start gap-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">💡</span>
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+            <h3 className="font-semibold text-text-primary mb-1">
               Pro Tip
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-text-secondary">
               Follow friends to see their recipes here in your personalized feed. Until then, explore what the community is cooking!
             </p>
           </div>
           <button
             onClick={() => setShowTip(false)}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0"
+            className="text-text-muted hover:text-text-secondary flex-shrink-0"
             aria-label="Dismiss tip"
           >
             ✕

@@ -14,19 +14,19 @@ export default function TrendingRecipes({ recipes }: TrendingRecipesProps) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">🔥</span>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold text-text-primary">
             Trending Recipes This Week
           </h2>
         </div>
         <Link
           href="/explore"
-          className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium"
+          className="text-sm text-text-secondary hover:text-text-primary font-medium"
         >
           See all →
         </Link>
       </div>
 
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-sm text-text-muted mb-4">
         Popular recipes from the Cookit community
       </p>
 
@@ -39,10 +39,10 @@ export default function TrendingRecipes({ recipes }: TrendingRecipesProps) {
               href={`/recipes/${recipe.id}`}
               className="group block w-[200px] flex-shrink-0"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
+              <div className="bg-surface rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-border">
                 {/* Image */}
                 {recipe.image_url ? (
-                  <div className="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="aspect-square w-full overflow-hidden bg-gray-100">
                     <img
                       src={recipe.image_url}
                       alt={recipe.title}
@@ -50,19 +50,19 @@ export default function TrendingRecipes({ recipes }: TrendingRecipesProps) {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-square w-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                  <div className="aspect-square w-full bg-gray-100 flex items-center justify-center">
                     <span className="text-4xl">🍴</span>
                   </div>
                 )}
 
                 {/* Info */}
                 <div className="p-3">
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="font-semibold text-text-primary text-sm mb-2 line-clamp-2 group-hover:text-accent transition-colors">
                     {recipe.title}
                   </h3>
 
                   {/* Stats */}
-                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <div className="flex items-center gap-3 text-xs text-text-muted mb-2">
                     <div className="flex items-center gap-1">
                       <span>{recipe.like_count > 0 ? '❤️' : '🤍'}</span>
                       <span>{recipe.like_count}</span>
@@ -74,7 +74,7 @@ export default function TrendingRecipes({ recipes }: TrendingRecipesProps) {
                   </div>
 
                   {/* Author */}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-text-muted truncate">
                     by @{recipe.author_username}
                   </p>
                 </div>
