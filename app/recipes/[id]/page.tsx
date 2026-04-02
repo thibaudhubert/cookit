@@ -9,12 +9,23 @@ import Layout from '@/components/ui/Layout'
 import AppHeader from '@/components/ui/AppHeader'
 import type { RecipeWithDetails } from '@/lib/types/recipe'
 
+// Enable ISR caching for 5 minutes (content changes less frequently)
+export const revalidate = 300
+
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
+
+  // Guard against reserved routes
+  if (id === 'new' || id === 'create') {
+    return {
+      title: 'Create Recipe | Cookit',
+    }
+  }
+
   const supabase = await createClient()
 
   const { data: recipe, error } = await supabase
@@ -56,6 +67,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function RecipePage({ params }: PageProps) {
   const { id } = await params
+
+  // Guard against reserved routes
+  if (id === 'new' || id === 'create') {
+    redirect('/recipes/new')
+  }
+
   const supabase = await createClient()
 
   // Get current user
@@ -67,56 +84,57 @@ export default async function RecipePage({ params }: PageProps) {
     redirect('/auth')
   }
 
-  // Fetch recipe with all details
-  // Note: Use profiles!recipes_author_id_fkey to specify exact relationship
-  const { data: recipe, error: recipeError } = await supabase
-    .from('recipes')
-    .select(
+  // Fetch recipe and comments in parallel for better performance
+  const [recipeResult, commentsResult] = await Promise.all([
+    // Fetch recipe with all details
+    supabase
+      .from('recipes')
+      .select(
+        `
+        *,
+        author:profiles!recipes_author_id_fkey(*),
+        ingredients:recipe_ingredients(*),
+        steps:recipe_steps(*)
       `
-      *,
-      author:profiles!recipes_author_id_fkey(*),
-      ingredients:recipe_ingredients(*),
-      steps:recipe_steps(*)
-    `
-    )
-    .eq('id', id)
-    .order('position', { referencedTable: 'recipe_ingredients', ascending: true })
-    .order('position', { referencedTable: 'recipe_steps', ascending: true })
-    .single()
+      )
+      .eq('id', id)
+      .order('position', { referencedTable: 'recipe_ingredients', ascending: true })
+      .order('position', { referencedTable: 'recipe_steps', ascending: true })
+      .single(),
 
-  // Handle errors properly - don't hide real errors behind 404
-  if (recipeError) {
+    // Fetch comments
+    supabase
+      .from('comments')
+      .select(
+        `
+        *,
+        author:profiles(username, display_name, avatar_url)
+      `
+      )
+      .eq('recipe_id', id)
+      .order('created_at', { ascending: true }),
+  ])
+
+  // Handle recipe errors properly
+  if (recipeResult.error) {
     // PGRST116 = "not found" error from PostgREST
-    if (recipeError.code === 'PGRST116') {
+    if (recipeResult.error.code === 'PGRST116') {
       console.log(`Recipe not found: ${id}`)
       notFound()
     }
     // Any other error is a real database/query error - surface it
-    console.error('Error fetching recipe:', recipeError)
-    throw new Error(`Failed to fetch recipe: ${recipeError.message}`)
+    console.error('Error fetching recipe:', recipeResult.error)
+    throw new Error(`Failed to fetch recipe: ${recipeResult.error.message}`)
   }
 
-  if (!recipe) {
+  if (!recipeResult.data) {
     console.log(`Recipe returned null: ${id}`)
     notFound()
   }
 
-  const recipeData = recipe as unknown as RecipeWithDetails
+  const recipeData = recipeResult.data as unknown as RecipeWithDetails
   const isOwner = user.id === recipeData.author_id
-
-  // Fetch comments for this recipe
-  const { data: comments } = await supabase
-    .from('comments')
-    .select(
-      `
-      *,
-      author:profiles(username, display_name, avatar_url)
-    `
-    )
-    .eq('recipe_id', id)
-    .order('created_at', { ascending: true })
-
-  const commentsData = (comments || []) as any[]
+  const commentsData = (commentsResult.data || []) as any[]
 
   const handleSignOut = async () => {
     'use server'

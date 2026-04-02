@@ -14,6 +14,9 @@ import type { RecipeWithSocialData } from '@/lib/types/recipe'
 
 const RECIPES_PER_PAGE = 20
 
+// Enable ISR caching for 30 seconds (short cache for personalized content)
+export const revalidate = 30
+
 export default async function FeedPage({
   searchParams,
 }: {
@@ -31,33 +34,45 @@ export default async function FeedPage({
     redirect('/auth')
   }
 
-  // Fetch recipes using database function with social data
-  // Only show recipes from friends + own recipes (personalized feed)
-  const { data: recipes, error } = await supabase.rpc('get_feed_recipes', {
-    p_user_id: user.id,
-    p_limit: RECIPES_PER_PAGE,
-    p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
-    p_search_query: null,
-    p_friends_only: true,
-  })
+  // Fetch data in parallel for better performance
+  const [recipesResult, profileResult] = await Promise.all([
+    // Fetch recipes using database function
+    supabase.rpc('get_feed_recipes', {
+      p_user_id: user.id,
+      p_limit: RECIPES_PER_PAGE,
+      p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
+      p_search_query: null,
+      p_friends_only: true,
+    }),
+    // Fetch user profile
+    supabase
+      .from('profiles')
+      .select('display_name, username')
+      .eq('id', user.id)
+      .single(),
+  ])
 
-  if (error) {
-    console.error('Error fetching recipes:', error)
+  if (recipesResult.error) {
+    console.error('Error fetching recipes:', recipesResult.error)
   }
 
-  const recipesData = (recipes || []) as RecipeWithSocialData[]
-
-  // Fetch user profile for personalization
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('display_name, username')
-    .eq('id', user.id)
-    .single()
+  const recipesData = (recipesResult.data || []) as RecipeWithSocialData[]
+  const profile = profileResult.data
 
   // If feed is empty on first page, fetch trending content for empty state
   const showEmptyState = recipesData.length === 0 && currentPage === 1
-  const trendingRecipes = showEmptyState ? await getTrendingRecipes(6) : []
-  const popularCreators = showEmptyState ? await getPopularCreators(6) : []
+  let trendingRecipes: RecipeWithSocialData[] = []
+  let popularCreators: any[] = []
+
+  if (showEmptyState) {
+    // Fetch trending content in parallel
+    const [trending, creators] = await Promise.all([
+      getTrendingRecipes(6),
+      getPopularCreators(6),
+    ])
+    trendingRecipes = trending
+    popularCreators = creators
+  }
 
   // For pagination, we need a total count - let's get it separately
   const { count } = await supabase

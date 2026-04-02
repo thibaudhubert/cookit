@@ -15,6 +15,7 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
   const navItems = [
     { href: '/feed', label: 'Feed' },
     { href: '/explore', label: 'Explore' },
+    { href: '/friends', label: 'Friends' },
     { href: '/profile', label: 'Profile' },
   ]
 
@@ -27,7 +28,7 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
       </Link>
 
       {/* Navigation with Apple-style spacing and hover */}
-      <nav className="flex items-center gap-8">
+      <nav className="flex items-center gap-6">
         {navItems.map((item) => (
           <Link
             key={item.href}
@@ -42,6 +43,13 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
             {item.label}
           </Link>
         ))}
+
+        <Link
+          href="/recipes/new"
+          className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover font-semibold text-sm shadow-apple hover:shadow-apple-lg transition-all duration-200 active:scale-[0.98]"
+        >
+          + Create
+        </Link>
 
         <NotificationBell />
 

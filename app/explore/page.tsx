@@ -13,6 +13,9 @@ const RECIPES_PER_PAGE = 20
 const PEOPLE_PER_PAGE = 20
 const TRENDING_LIMIT = 8
 
+// Enable ISR caching for 60 seconds (public content)
+export const revalidate = 60
+
 export default async function ExplorePage({
   searchParams,
 }: {
@@ -32,52 +35,66 @@ export default async function ExplorePage({
     redirect('/auth')
   }
 
-  // Fetch trending recipes (top liked recipes for the last 7 days)
   let trendingRecipes: RecipeWithSocialData[] = []
-  if (mode === 'recipes' && !searchQuery) {
-    const { data: trending } = await supabase.rpc('get_feed_recipes', {
-      p_user_id: user.id,
-      p_limit: TRENDING_LIMIT,
-      p_offset: 0,
-      p_search_query: null,
-      p_friends_only: false,
-    })
-    // Sort by like count to get trending
-    trendingRecipes = ((trending || []) as RecipeWithSocialData[])
-      .sort((a, b) => b.like_count - a.like_count)
-      .slice(0, TRENDING_LIMIT)
-  }
-
   let recipesData: RecipeWithSocialData[] = []
   let peopleData: Profile[] = []
   let count = 0
   let hasMore = false
 
   if (mode === 'recipes') {
-    // Fetch recipes using database function with social data and search
-    const { data: recipes, error } = await supabase.rpc('get_feed_recipes', {
-      p_user_id: user.id,
-      p_limit: RECIPES_PER_PAGE,
-      p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
-      p_search_query: searchQuery || null,
-      p_friends_only: false,
-    })
+    // Fetch recipes and trending in parallel when no search
+    if (!searchQuery) {
+      const [recipesResult, trendingResult, countResult] = await Promise.all([
+        supabase.rpc('get_feed_recipes', {
+          p_user_id: user.id,
+          p_limit: RECIPES_PER_PAGE,
+          p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
+          p_search_query: null,
+          p_friends_only: false,
+        }),
+        supabase.rpc('get_feed_recipes', {
+          p_user_id: user.id,
+          p_limit: TRENDING_LIMIT,
+          p_offset: 0,
+          p_search_query: null,
+          p_friends_only: false,
+        }),
+        supabase.from('recipes').select('*', { count: 'exact', head: true }),
+      ])
 
-    if (error) {
-      console.error('Error fetching recipes:', error)
+      if (recipesResult.error) {
+        console.error('Error fetching recipes:', recipesResult.error)
+      }
+
+      recipesData = (recipesResult.data || []) as RecipeWithSocialData[]
+      trendingRecipes = ((trendingResult.data || []) as RecipeWithSocialData[])
+        .sort((a, b) => b.like_count - a.like_count)
+        .slice(0, TRENDING_LIMIT)
+      count = countResult.count || 0
+    } else {
+      // With search, fetch recipes and count in parallel
+      const [recipesResult, countResult] = await Promise.all([
+        supabase.rpc('get_feed_recipes', {
+          p_user_id: user.id,
+          p_limit: RECIPES_PER_PAGE,
+          p_offset: (currentPage - 1) * RECIPES_PER_PAGE,
+          p_search_query: searchQuery,
+          p_friends_only: false,
+        }),
+        supabase
+          .from('recipes')
+          .select('*', { count: 'exact', head: true })
+          .ilike('title', `%${searchQuery}%`),
+      ])
+
+      if (recipesResult.error) {
+        console.error('Error fetching recipes:', recipesResult.error)
+      }
+
+      recipesData = (recipesResult.data || []) as RecipeWithSocialData[]
+      count = countResult.count || 0
     }
 
-    recipesData = (recipes || []) as RecipeWithSocialData[]
-
-    // For pagination with search, count matching recipes
-    let countQuery = supabase.from('recipes').select('*', { count: 'exact', head: true })
-
-    if (searchQuery) {
-      countQuery = countQuery.ilike('title', `%${searchQuery}%`)
-    }
-
-    const { count: recipeCount } = await countQuery
-    count = recipeCount || 0
     const totalPages = count ? Math.ceil(count / RECIPES_PER_PAGE) : 1
     hasMore = currentPage < totalPages
   } else {

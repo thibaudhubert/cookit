@@ -7,6 +7,9 @@ import Layout from '@/components/ui/Layout'
 import AppHeader from '@/components/ui/AppHeader'
 import type { Profile, RecipeWithSocialData } from '@/lib/types/recipe'
 
+// Enable ISR caching for 60 seconds
+export const revalidate = 60
+
 interface PageProps {
   params: Promise<{ username: string }>
   searchParams: Promise<{ tab?: string }>
@@ -64,52 +67,90 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
     }
   }
 
-  // Get friend count
-  const { data: friends } = await supabase.rpc('get_friends', {
-    user_id: profileData.id,
-  })
-  const friendCount = friends?.length || 0
+  // Fetch all data in parallel for better performance
+  const [friendsResult, userRecipesResult, likedRecipesResult, bookmarkedRecipesResult] = await Promise.all([
+    // Get friend count
+    supabase.rpc('get_friends', { user_id: profileData.id }),
 
-  // Get all recipes with social data
-  const { data: allRecipes } = await supabase.rpc('get_feed_recipes', {
-    p_user_id: user.id,
-    p_limit: 100,
-    p_offset: 0,
-    p_search_query: null,
-    p_friends_only: false,
-  })
+    // Get user's recipes directly (not all recipes)
+    supabase
+      .from('recipes')
+      .select('*, author:profiles!recipes_author_id_fkey(username, display_name, avatar_url)')
+      .eq('author_id', profileData.id)
+      .order('created_at', { ascending: false })
+      .limit(50),
 
-  // Filter to only this user's recipes
-  const userRecipes = (allRecipes || []).filter(
-    (recipe: RecipeWithSocialData) => recipe.author_id === profileData.id
-  )
-
-  // Get liked recipes
-  const { data: likedRecipesData } = await supabase
-    .from('likes')
-    .select('recipe_id')
-    .eq('user_id', profileData.id)
-
-  const likedRecipeIds = (likedRecipesData || []).map((like) => like.recipe_id)
-  const likedRecipes = (allRecipes || []).filter((recipe: RecipeWithSocialData) =>
-    likedRecipeIds.includes(recipe.id)
-  )
-
-  // Get bookmarked recipes (only if own profile)
-  let bookmarkedRecipes: RecipeWithSocialData[] = []
-  if (isOwnProfile) {
-    const { data: bookmarksData } = await supabase
-      .from('bookmarks')
+    // Get liked recipe IDs
+    supabase
+      .from('likes')
       .select('recipe_id')
-      .eq('user_id', user.id)
+      .eq('user_id', profileData.id),
 
-    const bookmarkedRecipeIds = (bookmarksData || []).map((bookmark) => bookmark.recipe_id)
-    bookmarkedRecipes = (allRecipes || []).filter((recipe: RecipeWithSocialData) =>
-      bookmarkedRecipeIds.includes(recipe.id)
-    )
-  }
+    // Get bookmarked recipe IDs (only if own profile)
+    isOwnProfile
+      ? supabase.from('bookmarks').select('recipe_id').eq('user_id', user.id)
+      : Promise.resolve({ data: [] }),
+  ])
+
+  const friendCount = friendsResult.data?.length || 0
+
+  // Transform user recipes to include social data
+  const userRecipes = (userRecipesResult.data || []).map((recipe: any) => ({
+    ...recipe,
+    author_username: recipe.author?.username || '',
+    author_display_name: recipe.author?.display_name || '',
+    author_avatar_url: recipe.author?.avatar_url || null,
+    like_count: 0,
+    is_liked_by_me: false,
+    is_bookmarked_by_me: false,
+    comment_count: 0,
+  })) as RecipeWithSocialData[]
 
   const recipeCount = userRecipes.length
+
+  // Get liked recipes if we have any
+  let likedRecipes: RecipeWithSocialData[] = []
+  if (likedRecipesResult.data && likedRecipesResult.data.length > 0) {
+    const likedRecipeIds = likedRecipesResult.data.map((like) => like.recipe_id)
+    const { data: likedRecipesData } = await supabase
+      .from('recipes')
+      .select('*, author:profiles!recipes_author_id_fkey(username, display_name, avatar_url)')
+      .in('id', likedRecipeIds)
+      .limit(50)
+
+    likedRecipes = (likedRecipesData || []).map((recipe: any) => ({
+      ...recipe,
+      author_username: recipe.author?.username || '',
+      author_display_name: recipe.author?.display_name || '',
+      author_avatar_url: recipe.author?.avatar_url || null,
+      like_count: 0,
+      is_liked_by_me: true,
+      is_bookmarked_by_me: false,
+      comment_count: 0,
+    })) as RecipeWithSocialData[]
+  }
+
+  // Get bookmarked recipes if we have any
+  let bookmarkedRecipes: RecipeWithSocialData[] = []
+  if (isOwnProfile && bookmarkedRecipesResult.data && bookmarkedRecipesResult.data.length > 0) {
+    const bookmarkedRecipeIds = bookmarkedRecipesResult.data.map((bookmark) => bookmark.recipe_id)
+    const { data: bookmarkedRecipesData } = await supabase
+      .from('recipes')
+      .select('*, author:profiles!recipes_author_id_fkey(username, display_name, avatar_url)')
+      .in('id', bookmarkedRecipeIds)
+      .limit(50)
+
+    bookmarkedRecipes = (bookmarkedRecipesData || []).map((recipe: any) => ({
+      ...recipe,
+      author_username: recipe.author?.username || '',
+      author_display_name: recipe.author?.display_name || '',
+      author_avatar_url: recipe.author?.avatar_url || null,
+      like_count: 0,
+      is_liked_by_me: false,
+      is_bookmarked_by_me: true,
+      comment_count: 0,
+    })) as RecipeWithSocialData[]
+  }
 
   const handleSignOut = async () => {
     'use server'

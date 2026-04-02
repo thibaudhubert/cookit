@@ -8,10 +8,9 @@ export default function NotFound() {
           <span className="text-8xl">🍴</span>
         </div>
         <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
-        <p className="text-2xl text-gray-600 mb-8">Recipe Not Found</p>
+        <p className="text-2xl text-gray-600 mb-8">Page Not Found</p>
         <p className="text-gray-500 mb-8 max-w-md mx-auto">
-          Looks like this page doesn't exist. It might have been removed, or the URL might be
-          incorrect.
+          This page doesn't exist or may have been moved.
         </p>
         <div className="flex gap-4 justify-center">
           <Link
