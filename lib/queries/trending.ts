@@ -38,7 +38,7 @@ export async function getPopularCreators(limit: number = 6) {
 
   if (!user) return []
 
-  // Get profiles with recipe counts
+  // Single query: join profiles with recipe counts using a subquery aggregation
   const { data: profiles } = await supabase
     .from('profiles')
     .select(`
@@ -46,33 +46,22 @@ export async function getPopularCreators(limit: number = 6) {
       username,
       display_name,
       avatar_url,
-      bio
+      bio,
+      recipes(count)
     `)
     .neq('id', user.id)
-    .limit(100)
+    .gt('recipes.count', 0)
+    .order('recipes.count', { ascending: false })
+    .limit(limit)
 
   if (!profiles) return []
 
-  // Get recipe counts for each profile
-  const profilesWithCounts = await Promise.all(
-    profiles.map(async (profile) => {
-      const { count } = await supabase
-        .from('recipes')
-        .select('*', { count: 'exact', head: true })
-        .eq('author_id', profile.id)
-
-      return {
-        ...profile,
-        recipe_count: count || 0,
-      }
-    })
-  )
-
-  // Sort by recipe count and return top N
-  const sorted = profilesWithCounts
-    .filter((p) => p.recipe_count > 0)
-    .sort((a, b) => b.recipe_count - a.recipe_count)
-    .slice(0, limit)
-
-  return sorted as (Profile & { recipe_count: number })[]
+  return profiles.map((p) => ({
+    id: p.id,
+    username: p.username,
+    display_name: p.display_name,
+    avatar_url: p.avatar_url,
+    bio: p.bio,
+    recipe_count: (p.recipes as unknown as { count: number }[])[0]?.count ?? 0,
+  })) as (Profile & { recipe_count: number })[]
 }

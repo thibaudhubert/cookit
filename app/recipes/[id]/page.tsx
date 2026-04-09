@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Metadata } from 'next'
 import DeleteRecipeButton from '@/components/DeleteRecipeButton'
 import CommentSection from '@/components/CommentSection'
@@ -84,8 +85,8 @@ export default async function RecipePage({ params }: PageProps) {
     redirect('/auth')
   }
 
-  // Fetch recipe and comments in parallel for better performance
-  const [recipeResult, commentsResult] = await Promise.all([
+  // Fetch recipe, comments, and current user profile in parallel
+  const [recipeResult, commentsResult, profileResult] = await Promise.all([
     // Fetch recipe with all details
     supabase
       .from('recipes')
@@ -113,6 +114,13 @@ export default async function RecipePage({ params }: PageProps) {
       )
       .eq('recipe_id', id)
       .order('created_at', { ascending: true }),
+
+    // Fetch current user's profile for optimistic comment rendering
+    supabase
+      .from('profiles')
+      .select('username, display_name, avatar_url')
+      .eq('id', user.id)
+      .single(),
   ])
 
   // Handle recipe errors properly
@@ -135,6 +143,7 @@ export default async function RecipePage({ params }: PageProps) {
   const recipeData = recipeResult.data as unknown as RecipeWithDetails
   const isOwner = user.id === recipeData.author_id
   const commentsData = (commentsResult.data || []) as any[]
+  const currentUserProfile = profileResult.data || { username: '', display_name: null, avatar_url: null }
 
   const handleSignOut = async () => {
     'use server'
@@ -183,10 +192,12 @@ export default async function RecipePage({ params }: PageProps) {
           {/* Author Info */}
           <div className="flex items-center gap-4 mb-8 pb-8 border-b border-border">
             {recipeData.author.avatar_url ? (
-              <img
+              <Image
                 src={recipeData.author.avatar_url}
                 alt={recipeData.author.display_name || recipeData.author.username}
-                className="w-12 h-12 rounded-full"
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
@@ -268,9 +279,11 @@ export default async function RecipePage({ params }: PageProps) {
                   <div className="flex-1">
                     <p className="text-gray-700 mb-3">{step.instruction}</p>
                     {step.image_url && (
-                      <img
+                      <Image
                         src={step.image_url}
                         alt={`Step ${index + 1}`}
+                        width={448}
+                        height={192}
                         className="w-full max-w-md h-48 object-cover rounded-md"
                       />
                     )}
@@ -286,6 +299,7 @@ export default async function RecipePage({ params }: PageProps) {
           recipeId={id}
           recipeAuthorId={recipeData.author_id}
           currentUserId={user.id}
+          currentUserProfile={currentUserProfile}
           initialComments={commentsData}
         />
     </Layout>

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import FriendshipButton from '@/components/FriendshipButton'
 import RecipeCardGrid from '@/components/RecipeCardGrid'
 import Layout from '@/components/ui/Layout'
@@ -167,9 +168,11 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
             <div className="flex flex-col sm:flex-row items-start gap-8 mb-8">
               {/* Avatar */}
               {profileData.avatar_url ? (
-                <img
+                <Image
                   src={profileData.avatar_url}
                   alt={profileData.display_name || profileData.username}
+                  width={128}
+                  height={128}
                   className="w-32 h-32 rounded-full object-cover border-4 border-border-light"
                 />
               ) : (

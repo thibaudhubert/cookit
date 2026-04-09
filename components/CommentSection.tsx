@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
 import Link from 'next/link'
@@ -22,6 +23,7 @@ interface CommentSectionProps {
   recipeId: string
   recipeAuthorId: string
   currentUserId: string
+  currentUserProfile: { username: string; display_name: string | null; avatar_url: string | null }
   initialComments: Comment[]
 }
 
@@ -29,6 +31,7 @@ export default function CommentSection({
   recipeId,
   recipeAuthorId,
   currentUserId,
+  currentUserProfile,
   initialComments,
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
@@ -53,24 +56,13 @@ export default function CommentSection({
       return
     }
 
-    // Get current user's profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('username, display_name, avatar_url')
-      .eq('id', user.id)
-      .single()
-
     const optimisticComment: Comment = {
       id: `temp-${Date.now()}`,
       recipe_id: recipeId,
       author_id: user.id,
       content: newComment.trim(),
       created_at: new Date().toISOString(),
-      author: profile || {
-        username: 'unknown',
-        display_name: null,
-        avatar_url: null,
-      },
+      author: currentUserProfile,
     }
 
     setComments((prev) => [...prev, optimisticComment])
@@ -151,9 +143,11 @@ export default function CommentSection({
               {/* Avatar */}
               <Link href={`/profile/${comment.author.username}`}>
                 {comment.author.avatar_url ? (
-                  <img
+                  <Image
                     src={comment.author.avatar_url}
                     alt={comment.author.display_name || comment.author.username}
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full object-cover hover:opacity-80 transition-opacity"
                   />
                 ) : (

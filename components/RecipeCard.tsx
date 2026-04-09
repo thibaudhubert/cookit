@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
@@ -106,9 +107,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       <div className="p-4 flex items-center gap-3">
         <Link href={`/profile/${recipe.author_username}`}>
           {recipe.author_avatar_url ? (
-            <img
+            <Image
               src={recipe.author_avatar_url}
               alt={recipe.author_display_name || recipe.author_username}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full object-cover hover:opacity-80 transition-opacity"
             />
           ) : (

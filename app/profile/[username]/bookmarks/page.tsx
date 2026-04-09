@@ -36,7 +36,7 @@ export default async function BookmarksPage({ params }: PageProps) {
     redirect(`/profile/${username}`)
   }
 
-  // Fetch bookmarked recipes with social data
+  // Fetch bookmarked recipe IDs in bookmark order
   const { data: bookmarksData } = await supabase
     .from('bookmarks')
     .select('recipe_id')
@@ -48,18 +48,28 @@ export default async function BookmarksPage({ params }: PageProps) {
   let recipesData: RecipeWithSocialData[] = []
 
   if (recipeIds.length > 0) {
-    // Fetch full recipe data for bookmarked recipes
-    const { data: recipes } = await supabase.rpc('get_feed_recipes', {
-      p_user_id: user.id,
-      p_limit: 100, // Reasonable limit for bookmarks
-      p_offset: 0,
-      p_search_query: null,
-    })
+    // Fetch only the bookmarked recipes directly — no client-side filtering
+    const { data: recipes } = await supabase
+      .from('recipes')
+      .select('*, author:profiles!recipes_author_id_fkey(username, display_name, avatar_url)')
+      .in('id', recipeIds)
+      .limit(100)
 
-    // Filter to only bookmarked recipes
-    recipesData = (recipes || []).filter((r: RecipeWithSocialData) =>
-      recipeIds.includes(r.id)
-    )
+    // Preserve bookmark order
+    const recipeMap = new Map((recipes || []).map((r: any) => [r.id, r]))
+    recipesData = recipeIds
+      .map((id) => recipeMap.get(id))
+      .filter(Boolean)
+      .map((recipe: any) => ({
+        ...recipe,
+        author_username: recipe.author?.username || '',
+        author_display_name: recipe.author?.display_name || '',
+        author_avatar_url: recipe.author?.avatar_url || null,
+        like_count: 0,
+        is_liked_by_me: false,
+        is_bookmarked_by_me: true,
+        comment_count: 0,
+      })) as RecipeWithSocialData[]
   }
 
   const handleSignOut = async () => {

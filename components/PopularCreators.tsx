@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/lib/types/recipe'
 
@@ -55,9 +56,11 @@ export default function PopularCreators({ creators }: PopularCreatorsProps) {
               {/* Avatar */}
               <Link href={`/profile/${creator.username}`} className="block mb-4">
                 {creator.avatar_url ? (
-                  <img
+                  <Image
                     src={creator.avatar_url}
                     alt={creator.display_name || creator.username}
+                    width={80}
+                    height={80}
                     className="w-20 h-20 rounded-full object-cover mx-auto border-2 border-border-light"
                   />
                 ) : (

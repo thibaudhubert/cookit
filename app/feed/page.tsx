@@ -74,10 +74,10 @@ export default async function FeedPage({
     popularCreators = creators
   }
 
-  // For pagination, we need a total count - let's get it separately
+  // Use estimated count for pagination (fast, avoids full table scan)
   const { count } = await supabase
     .from('recipes')
-    .select('*', { count: 'exact', head: true })
+    .select('*', { count: 'estimated', head: true })
 
   const totalPages = count ? Math.ceil(count / RECIPES_PER_PAGE) : 1
   const hasMore = currentPage < totalPages

@@ -4,8 +4,12 @@ import * as path from 'path'
 
 dotenv.config({ path: path.join(__dirname, '../.env.local') })
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxZWNhZG94dXd6dnFxd3dqcGtsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM3NTg4OCwiZXhwIjoyMDg5OTUxODg4fQ.yZXdgpjxN6T7xW86CKolwr8UlwxPkTTKP53PvWrH4qs'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Missing required env vars: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env.local')
+}
 
 // Create admin client with service role
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
@@ -91,7 +95,7 @@ async function seedDatabase() {
     // Create auth user
     const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
       email: chef.email,
-      password: 'demo-password-123',
+      password: crypto.randomUUID() + crypto.randomUUID(),
       email_confirm: true,
       user_metadata: {
         username: chef.username,
@@ -240,7 +244,7 @@ async function seedDatabase() {
       username: 'juliachild',
       title: 'Boeuf Bourguignon',
       description: 'Classic French beef stew braised in red wine with pearl onions, mushrooms, and bacon. A masterpiece of French cuisine.',
-      image_url: 'https://images.unsplash.com/photo-1607621054049-6562c4e229c4?w=800',
+      image_url: 'https://images.unsplash.com/photo-1534939561126-855b8675edd7?w=800',
       prep_time_minutes: 30,
       cook_time_minutes: 180,
       servings: 6,
@@ -309,7 +313,7 @@ async function seedDatabase() {
       username: 'yotamottolenghi',
       title: 'Roasted Cauliflower with Tahini',
       description: 'Whole roasted cauliflower with Middle Eastern spices, drizzled with tahini sauce and pomegranate seeds.',
-      image_url: 'https://images.unsplash.com/photo-1568584711271-16fdf9143003?w=800',
+      image_url: 'https://images.unsplash.com/photo-1613743983303-b3e89f8a2b80?w=800',
       prep_time_minutes: 15,
       cook_time_minutes: 45,
       servings: 4,

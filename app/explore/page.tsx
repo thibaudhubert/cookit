@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import RecipeCard from '@/components/RecipeCard'
 import LoadMoreButton from '@/components/LoadMoreButton'
 import SearchBar from '@/components/SearchBar'
@@ -246,9 +247,11 @@ export default async function ExplorePage({
                     className="flex items-center gap-5 p-5 bg-surface rounded-2xl shadow-apple hover:shadow-apple-lg transition-all duration-200 border border-border hover:scale-[1.01]"
                   >
                     {person.avatar_url ? (
-                      <img
+                      <Image
                         src={person.avatar_url}
                         alt={person.display_name || person.username}
+                        width={64}
+                        height={64}
                         className="w-16 h-16 rounded-full object-cover border-2 border-border-light"
                       />
                     ) : (

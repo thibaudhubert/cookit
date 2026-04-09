@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
@@ -92,9 +93,11 @@ export default function FriendRequests({ requests }: FriendRequestsProps) {
             className="flex items-center gap-3 flex-1"
           >
             {request.requester.avatar_url ? (
-              <img
+              <Image
                 src={request.requester.avatar_url}
                 alt={request.requester.display_name || request.requester.username}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (

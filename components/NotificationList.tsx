@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { timeAgo } from '@/lib/utils/timeAgo'
 
@@ -139,9 +140,11 @@ export default function NotificationList({ notifications: initialNotifications, 
           >
             {/* Actor Avatar */}
             {notification.actor.avatar_url ? (
-              <img
+              <Image
                 src={notification.actor.avatar_url}
                 alt={notification.actor.display_name || notification.actor.username}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover flex-shrink-0"
               />
             ) : (

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -73,9 +74,11 @@ export default function FriendsList({ friends, currentUserId }: FriendsListProps
             className="flex items-center gap-3 flex-1"
           >
             {friend.avatar_url ? (
-              <img
+              <Image
                 src={friend.avatar_url}
                 alt={friend.display_name || friend.username}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (

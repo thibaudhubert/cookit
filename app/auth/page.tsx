@@ -6,8 +6,8 @@ import { useState } from 'react'
 
 const SHOWCASE_RECIPES = [
   { title: 'Beef Wellington', image: 'https://images.unsplash.com/photo-1615937722923-67f6deaf2cc9?w=800&h=600&fit=crop' },
-  { title: 'Boeuf Bourguignon', image: 'https://images.unsplash.com/photo-1607621054049-6562c4e229c4?w=800&h=600&fit=crop' },
-  { title: 'Roasted Cauliflower', image: 'https://images.unsplash.com/photo-1568584711271-16fdf9143003?w=800&h=600&fit=crop' },
+  { title: 'Boeuf Bourguignon', image: 'https://images.unsplash.com/photo-1534939561126-855b8675edd7?w=800&h=600&fit=crop' },
+  { title: 'Roasted Cauliflower', image: 'https://images.unsplash.com/photo-1613743983303-b3e89f8a2b80?w=800&h=600&fit=crop' },
   { title: 'Perfect Scrambled Eggs', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&h=600&fit=crop' },
   { title: 'Chocolate Cake', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&h=600&fit=crop' },
   { title: 'Quick Tomato Pasta', image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&h=600&fit=crop' },

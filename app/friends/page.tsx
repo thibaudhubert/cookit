@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import Layout from '@/components/ui/Layout'
 import AppHeader from '@/components/ui/AppHeader'
 import PageHeader from '@/components/ui/PageHeader'
@@ -59,9 +60,11 @@ export default async function FriendsPage() {
               className="flex items-center gap-5 p-5 bg-surface rounded-2xl shadow-apple hover:shadow-apple-lg transition-all duration-200 border border-border hover:scale-[1.01]"
             >
               {friend.avatar_url ? (
-                <img
+                <Image
                   src={friend.avatar_url}
                   alt={friend.display_name || friend.username}
+                  width={64}
+                  height={64}
                   className="w-16 h-16 rounded-full object-cover border-2 border-border-light"
                 />
               ) : (
