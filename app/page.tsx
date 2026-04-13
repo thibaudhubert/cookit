@@ -16,16 +16,16 @@ export default function Home() {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link
             href="/auth"
-            className="rounded-lg bg-gray-900 px-8 py-3 text-white transition-colors hover:bg-gray-800"
+            className="rounded-lg bg-gray-900 px-8 py-3 text-white transition-colors hover:bg-gray-800 text-center"
           >
             Sign Up
           </Link>
           <Link
             href="/auth"
-            className="rounded-lg border border-gray-300 px-8 py-3 text-gray-900 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 px-8 py-3 text-gray-900 transition-colors hover:bg-gray-50 text-center"
           >
             Log In
           </Link>

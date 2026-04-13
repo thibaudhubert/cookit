@@ -7,7 +7,7 @@ interface HeroOnboardingProps {
 
 export default function HeroOnboarding({ userName }: HeroOnboardingProps) {
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-10 shadow-apple-lg border border-border-light mb-10">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-6 sm:p-10 shadow-apple-lg border border-border-light mb-10">
       <div className="max-w-2xl mx-auto text-center">
         <div className="mb-8">
           <span className="text-7xl">🍴</span>

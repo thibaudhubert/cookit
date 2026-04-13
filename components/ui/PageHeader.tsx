@@ -10,15 +10,15 @@ interface PageHeaderProps {
 
 export default function PageHeader({ title, description, action, className }: PageHeaderProps) {
   return (
-    <div className={cn('mb-10', className)}>
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-text-primary tracking-tight">{title}</h1>
+    <div className={cn('mb-8 sm:mb-10', className)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-4xl font-bold text-text-primary tracking-tight">{title}</h1>
           {description && (
-            <p className="mt-3 text-lg text-text-secondary">{description}</p>
+            <p className="mt-2 sm:mt-3 text-base sm:text-lg text-text-secondary">{description}</p>
           )}
         </div>
-        {action && <div className="ml-4">{action}</div>}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
     </div>
   )

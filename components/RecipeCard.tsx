@@ -136,8 +136,8 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         <RecipeImage
           src={recipe.image_url}
           alt={recipe.title}
-          className="w-full h-80 object-cover hover:opacity-95 transition-opacity"
-          fallbackClassName="w-full h-80"
+          className="w-full h-56 sm:h-80 object-cover hover:opacity-95 transition-opacity"
+          fallbackClassName="w-full h-56 sm:h-80"
           fallbackSize="large"
         />
       </Link>
@@ -187,7 +187,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-6 pt-3 border-t border-border">
+        <div className="flex items-center gap-4 sm:gap-6 pt-3 border-t border-border">
           <button
             onClick={handleLike}
             className={`flex items-center gap-2 transition-colors ${

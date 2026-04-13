@@ -21,14 +21,14 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
 
   return (
     <div className="flex items-center justify-between py-3">
-      {/* Logo with Apple-style weight */}
+      {/* Logo */}
       <Link href="/feed" className="flex items-center gap-2.5 hover:opacity-70 transition-opacity">
         <span className="text-2xl">🍴</span>
         <span className="text-xl font-semibold text-text-primary tracking-tight">Cookit</span>
       </Link>
 
-      {/* Navigation with Apple-style spacing and hover */}
-      <nav className="flex items-center gap-6">
+      {/* Desktop navigation (hidden on mobile — replaced by MobileNav) */}
+      <nav className="hidden sm:flex items-center gap-6">
         {navItems.map((item) => (
           <Link
             key={item.href}
@@ -62,6 +62,19 @@ export default function AppHeader({ onSignOut }: AppHeaderProps) {
           </button>
         )}
       </nav>
+
+      {/* Mobile: only show bell and sign out */}
+      <div className="flex sm:hidden items-center gap-3">
+        <NotificationBell />
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+          >
+            Sign Out
+          </button>
+        )}
+      </div>
     </div>
   )
 }

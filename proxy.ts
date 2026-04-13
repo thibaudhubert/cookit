@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_PATHS = ['/feed', '/profile']
+const PROTECTED_PATHS = ['/feed', '/profile', '/recipes/new', '/explore', '/notifications', '/friends', '/settings']
 const AUTH_PATH = '/auth'
 const AUTH_CALLBACK_PATH = '/auth/callback'
 

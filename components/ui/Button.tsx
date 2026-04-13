@@ -12,11 +12,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary: 'bg-accent text-white hover:bg-accent-hover shadow-apple hover:shadow-apple-lg active:scale-[0.98] focus:ring-accent',
-      secondary: 'bg-surface border-2 border-text-primary text-text-primary hover:bg-gray-50 shadow-apple-lg hover:shadow-apple-xl active:scale-[0.98] focus:ring-text-primary',
+      secondary: 'bg-gray-100 border-2 border-text-primary text-text-primary hover:bg-gray-200 shadow-apple-lg hover:shadow-apple-xl active:scale-[0.98] focus:ring-text-primary',
       ghost: 'text-text-secondary hover:bg-surface-hover hover:text-text-primary focus:ring-text-secondary',
       destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-apple hover:shadow-apple-lg active:scale-[0.98] focus:ring-red-600',
       success: 'bg-green-600 text-white hover:bg-green-700 shadow-apple hover:shadow-apple-lg active:scale-[0.98] focus:ring-green-600',
-      outline: 'bg-transparent border-2 border-border text-text-primary hover:bg-surface-hover shadow-apple hover:shadow-apple-lg active:scale-[0.98] focus:ring-border',
+      outline: 'bg-gray-100 border-2 border-border text-text-primary hover:bg-gray-200 shadow-apple hover:shadow-apple-lg active:scale-[0.98] focus:ring-border',
     }
 
     const sizes = {

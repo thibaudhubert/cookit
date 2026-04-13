@@ -159,17 +159,17 @@ export default async function RecipePage({ params }: PageProps) {
           <RecipeImage
             src={recipeData.image_url}
             alt={recipeData.title}
-            className="w-full h-96 object-cover rounded-2xl shadow-apple-lg"
-            fallbackClassName="w-full h-96 rounded-2xl"
+            className="w-full h-56 sm:h-96 object-cover rounded-2xl shadow-apple-lg"
+            fallbackClassName="w-full h-56 sm:h-96 rounded-2xl"
             fallbackSize="large"
           />
         </div>
 
         {/* Recipe Header */}
-        <div className="bg-surface rounded-2xl shadow-apple p-10 mb-8 border border-border">
+        <div className="bg-surface rounded-2xl shadow-apple p-6 sm:p-10 mb-8 border border-border">
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-text-primary tracking-tight mb-3">
+              <h1 className="text-2xl sm:text-4xl font-bold text-text-primary tracking-tight mb-3">
                 {recipeData.title}
               </h1>
               {recipeData.description && (

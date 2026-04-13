@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import MobileNav from '@/components/ui/MobileNav'
 
 interface LayoutProps {
   header: ReactNode
@@ -25,10 +26,12 @@ export default function Layout({ header, children, maxWidth = 'lg' }: LayoutProp
         </div>
       </header>
 
-      {/* Main content with generous spacing */}
-      <main className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-12`}>
+      {/* Main content with generous spacing; pb-24 on mobile to clear bottom nav */}
+      <main className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 pb-24 sm:pb-12`}>
         {children}
       </main>
+
+      <MobileNav />
     </div>
   )
 }

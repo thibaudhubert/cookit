@@ -164,8 +164,8 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
     <Layout maxWidth="lg" header={<AppHeader onSignOut={handleSignOut} />}>
         {/* Profile Header */}
         <div className="bg-surface rounded-2xl shadow-apple overflow-hidden mb-10 border border-border">
-          <div className="p-10">
-            <div className="flex flex-col sm:flex-row items-start gap-8 mb-8">
+          <div className="p-6 sm:p-10">
+            <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-8 mb-8">
               {/* Avatar */}
               {profileData.avatar_url ? (
                 <Image
@@ -185,7 +185,7 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h1 className="text-4xl font-bold text-text-primary tracking-tight mb-2">
+                    <h1 className="text-2xl sm:text-4xl font-bold text-text-primary tracking-tight mb-2">
                       {profileData.display_name || profileData.username}
                     </h1>
                     <p className="text-lg text-text-muted mb-4">@{profileData.username}</p>
@@ -215,7 +215,7 @@ export default async function UserProfilePage({ params, searchParams }: PageProp
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-8 mb-6">
+                <div className="flex items-center gap-5 sm:gap-8 mb-6">
                   <div>
                     <span className="font-bold text-text-primary text-xl">{recipeCount}</span>{' '}
                     <span className="text-base text-text-secondary">
